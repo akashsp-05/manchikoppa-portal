@@ -5,10 +5,8 @@ import { onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebas
 import { db, auth } from "./firebase";
 import { collection, query, where, getDocs, deleteDoc, doc, addDoc } from "firebase/firestore";
 import myPhoto from './myphoto.jpg';
-import SearchPage from './SearchPage';
 import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
-
 
 // All components are combined into this single file for simplicity.
 
@@ -80,7 +78,6 @@ function VillagerForm() {
     const [formData, setFormData] = useState({
         name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: ""
     });
-
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -112,15 +109,15 @@ function VillagerForm() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-gray-700">Name</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     <div>
                         <label className="block text-gray-700">Phone</label>
-                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     <div>
                         <label className="block text-gray-700">Work</label>
-                        <input type="text" name="work" value={formData.work} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                        <input type="text" name="work" value={formData.work} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     <div>
                         <label className="block text-gray-700">Address</label>
@@ -273,7 +270,7 @@ function BusinessForm() {
                 name: formData.name,
                 address: formData.address,
                 phone: formData.phone,
-                locationLink: formData.locationLink
+                locationLink: formData.locationLink,
             };
 
             const hasMembers = ["Shops", "Schools", "Wine Shop", "Rice Mill", "Interlock Factory", "Milk Dairy"].includes(businessType);
@@ -281,7 +278,6 @@ function BusinessForm() {
             const hasSpecification = ["Electrician", "Doctors", "Engineers", "Teachers"].includes(businessType);
             const isTemple = businessType === "Temple";
             const isGramaPanchayat = businessType === "Grama Panchayat";
-
 
             if (isTemple) {
                 dataToSave = {
@@ -334,31 +330,31 @@ function BusinessForm() {
                         <label className="block text-gray-700">
                             {isTemple ? "Temple Name" : (individualProfessions.includes(businessType) ? "Name" : `${businessType} Name`)}
                         </label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     {hasOwner && !isGramaPanchayat && (
                         <div>
                             <label className="block text-gray-700">
                                 {businessType === "Schools" ? "Principal Name" : "Owner Name"}
                             </label>
-                            <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                            <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                         </div>
                     )}
                     {(hasOwner || hasSpecification) && (
                         <div>
                             <label className="block text-gray-700">Phone Number</label>
-                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                         </div>
                     )}
                     {hasSpecification && (
                         <div>
                             <label className="block text-gray-700">Specification</label>
-                            <input type="text" name="specification" value={formData.specification} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                            <input type="text" name="specification" value={formData.specification} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                         </div>
                     )}
                     <div>
                         <label className="block text-gray-700">Address</label>
-                        <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                        <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     <div>
                         <label className="block text-gray-700">Location Link</label>
@@ -389,7 +385,105 @@ function BusinessForm() {
     );
 }
 
-// **Updated FeedbackForm Component with Name Input**
+function SearchPage({ user }) {
+    const [searchResults, setSearchResults] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
+
+    const { q } = useParams();
+    useEffect(() => {
+        if (q) {
+            setSearchQuery(q);
+            handleSearch(q);
+        }
+    }, [q]);
+
+    const handleSearch = async (queryText) => {
+        setIsLoading(true);
+        setSearchResults([]);
+        if (!queryText.trim()) {
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const q = query(
+                collection(db, "villagers"),
+                where("lowercaseName", ">=", queryText.toLowerCase()),
+                where("lowercaseName", "<=", queryText.toLowerCase() + "\uf8ff")
+            );
+            const querySnapshot = await getDocs(q);
+            const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            setSearchResults(results);
+        } catch (error) {
+            console.error("Error searching villagers:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDeleteVillager = async (id) => {
+        if (window.confirm("Are you sure you want to delete this villager's details?")) {
+            try {
+                await deleteDoc(doc(db, "villagers", id));
+                alert("Details deleted successfully!");
+                setSearchResults(searchResults.filter(villager => villager.id !== id));
+            } catch (error) {
+                console.error("Error deleting villager:", error);
+                alert("Failed to delete details. Please try again.");
+            }
+        }
+    };
+
+    return (
+        <div className="p-8 max-w-4xl mx-auto min-h-screen">
+            <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Villager Details</h2>
+            <div className="mb-6">
+                <form onSubmit={(e) => { e.preventDefault(); handleSearch(searchQuery); }} className="flex">
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search by name..."
+                        className="flex-grow p-3 rounded-l-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500"
+                    />
+                    <button type="submit" className="bg-blue-500 text-white p-3 rounded-r-lg hover:bg-blue-600 transition duration-300">
+                        Search
+                    </button>
+                </form>
+            </div>
+            {isLoading ? (
+                <p className="text-center text-gray-500">Loading...</p>
+            ) : searchResults.length > 0 ? (
+                <div className="space-y-4">
+                    {searchResults.map((villager) => (
+                        <div key={villager.id} className="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                            <div className="flex-1">
+                                <h3 className="font-bold text-xl text-blue-700">{villager.name}</h3>
+                                {villager.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{villager.phone}</span></p>}
+                                {villager.work && <p className="text-gray-700 text-sm">Work: <span className="font-semibold">{villager.work}</span></p>}
+                                {villager.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{villager.address}</span></p>}
+                                {villager.age && <p className="text-gray-700 text-sm">Age: <span className="font-semibold">{villager.age}</span></p>}
+                                {villager.dob && <p className="text-gray-700 text-sm">Date of Birth: <span className="font-semibold">{villager.dob}</span></p>}
+                                {villager.locationLink && <p className="text-gray-700 text-sm">Location: <a href={villager.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
+                            </div>
+                            {user && (
+                                <button onClick={() => handleDeleteVillager(villager.id)} className="flex items-center space-x-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-200 text-sm">
+                                    <FaTrash />
+                                    <span>Delete</span>
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-center text-gray-500">No details found. Try a different name.</p>
+            )}
+        </div>
+    );
+}
+
 function FeedbackForm() {
     const [name, setName] = useState("");
     const [feedbackText, setFeedbackText] = useState("");
@@ -458,7 +552,6 @@ function FeedbackForm() {
     );
 }
 
-// **Updated FeedbackPage Component for Admin to show Name**
 function FeedbackPage({ user }) {
     const [feedbackList, setFeedbackList] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -714,7 +807,6 @@ function App() {
                 <Route path="/search" element={<SearchPage user={user} />} />
                 <Route path="/feedback" element={<FeedbackForm />} />
                 <Route path="/admin-feedback" element={<FeedbackPage user={user} />} />
-                {/* NEW ROUTES FOR ANNOUNCEMENTS */}
                 <Route path="/announcements" element={<AnnouncementList />} />
                 <Route path="/add-announcement" element={<AnnouncementForm />} />
             </Routes>
