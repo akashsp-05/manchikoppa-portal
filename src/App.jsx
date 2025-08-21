@@ -4,11 +4,15 @@ import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaSt
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "./firebase";
 import { collection, query, where, getDocs, deleteDoc, doc, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from 'uuid';
 import myPhoto from './myphoto.jpg';
 import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
 
 // All components are combined into this single file for simplicity.
+
+const storage = getStorage();
 
 function AdminLogin() {
     const [email, setEmail] = useState("");
@@ -78,6 +82,7 @@ function VillagerForm() {
     const [formData, setFormData] = useState({
         name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: ""
     });
+    const [photoFile, setPhotoFile] = useState(null);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -85,16 +90,31 @@ function VillagerForm() {
         setFormData({ ...formData, [name]: value });
     };
 
+    const handlePhotoChange = (e) => {
+        if (e.target.files[0]) {
+            setPhotoFile(e.target.files[0]);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            let photoURL = "";
+            if (photoFile) {
+                const photoRef = ref(storage, `villager_photos/${uuidv4()}-${photoFile.name}`);
+                await uploadBytes(photoRef, photoFile);
+                photoURL = await getDownloadURL(photoRef);
+            }
+
             const villagerData = {
                 ...formData,
                 lowercaseName: formData.name.toLowerCase(),
+                photoURL: photoURL,
             };
             await addDoc(collection(db, "villagers"), villagerData);
             alert("Details saved successfully!");
             setFormData({ name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: "" });
+            setPhotoFile(null);
             navigate("/");
         } catch (error) {
             console.error("Error adding document:", error);
@@ -134,6 +154,10 @@ function VillagerForm() {
                     <div>
                         <label className="block text-gray-700">Google Maps Live Location Link</label>
                         <input type="url" name="locationLink" value={formData.locationLink} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" placeholder="e.g., https://goo.gl/maps/..." />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Profile Photo</label>
+                        <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
                     </div>
                     <button
                         type="submit"
@@ -195,6 +219,13 @@ function BusinessPage({ user }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {businesses.map((biz) => (
                         <div key={biz.id} className="bg-white p-6 rounded-lg shadow-md flex items-start space-x-4">
+                            {biz.photoURL && (
+                                <img
+                                    src={biz.photoURL}
+                                    alt={`${biz.name} photo`}
+                                    className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                                />
+                            )}
                             <div className="flex-1">
                                 <h3 className="font-bold text-xl text-blue-700 mb-2">{biz.name}</h3>
                                 {biz.ownerName && <p className="text-gray-700 text-sm">Owner/Principal: <span className="font-semibold">{biz.ownerName}</span></p>}
@@ -238,10 +269,17 @@ function BusinessForm() {
         name: "", phone: "", address: "", locationLink: "", specification: "", ownerName: "",
         members: [{ name: "", work: "", phone: "" }],
     });
+    const [photoFile, setPhotoFile] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
+    };
+
+    const handlePhotoChange = (e) => {
+        if (e.target.files[0]) {
+            setPhotoFile(e.target.files[0]);
+        }
     };
 
     const handleMemberChange = (index, e) => {
@@ -264,6 +302,13 @@ function BusinessForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            let photoURL = "";
+            if (photoFile) {
+                const photoRef = ref(storage, `business_photos/${uuidv4()}-${photoFile.name}`);
+                await uploadBytes(photoRef, photoFile);
+                photoURL = await getDownloadURL(photoRef);
+            }
+
             let dataToSave;
             const commonData = {
                 type: businessType,
@@ -271,6 +316,7 @@ function BusinessForm() {
                 address: formData.address,
                 phone: formData.phone,
                 locationLink: formData.locationLink,
+                photoURL: photoURL,
             };
 
             const hasMembers = ["Shops", "Schools", "Wine Shop", "Rice Mill", "Interlock Factory", "Milk Dairy"].includes(businessType);
@@ -285,6 +331,7 @@ function BusinessForm() {
                     name: formData.name,
                     address: formData.address,
                     locationLink: formData.locationLink,
+                    photoURL: photoURL,
                 };
             } else if (hasSpecification) {
                 dataToSave = {
@@ -359,6 +406,10 @@ function BusinessForm() {
                     <div>
                         <label className="block text-gray-700">Location Link</label>
                         <input type="url" name="locationLink" value={formData.locationLink} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Business/Service Photo</label>
+                        <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
                     </div>
                     {hasMembers && (
                         <div>
@@ -459,6 +510,13 @@ function SearchPage({ user }) {
                 <div className="space-y-4">
                     {searchResults.map((villager) => (
                         <div key={villager.id} className="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                            {villager.photoURL && (
+                                <img
+                                    src={villager.photoURL}
+                                    alt={`${villager.name}'s photo`}
+                                    className="w-20 h-20 rounded-full object-cover flex-shrink-0"
+                                />
+                            )}
                             <div className="flex-1">
                                 <h3 className="font-bold text-xl text-blue-700">{villager.name}</h3>
                                 {villager.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{villager.phone}</span></p>}
