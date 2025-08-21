@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.js'; // This is the corrected line
+import App from './app.js'; // This is the corrected line
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
