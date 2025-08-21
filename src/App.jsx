@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
-import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments } from "react-icons/fa";
+import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn } from "react-icons/fa";
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "./firebase";
 import { collection, query, where, getDocs, deleteDoc, doc, addDoc } from "firebase/firestore";
 import myPhoto from './myphoto.jpg';
 import SearchPage from './SearchPage';
+import AnnouncementForm from './AnnouncementForm';
+import AnnouncementList from './AnnouncementList';
+
 
 // All components are combined into this single file for simplicity.
 
@@ -639,6 +642,35 @@ function HomePage({ user }) {
             <div className="mt-8 flex justify-center px-4">
                 <img src="/village.png" alt="Village Banner" className="w-1/2 max-w-lg rounded-full shadow-2xl object-cover border-4 border-blue-500" />
             </div>
+
+            <div className="flex justify-center flex-col items-center mt-8 p-4 bg-gray-200 rounded-lg max-w-lg mx-auto shadow-inner">
+                <h2 className="text-3xl font-bold text-blue-800 mb-4">Village Announcements</h2>
+                <Link to="/announcements" className="text-lg text-blue-500 hover:underline">
+                    Click here to see all announcements.
+                </Link>
+                {user && (
+                    <Link to="/add-announcement" className="mt-4 flex items-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300 shadow-md">
+                        <FaBullhorn />
+                        <span>Add New Announcement</span>
+                    </Link>
+                )}
+            </div>
+
+            <div className="flex justify-center space-x-4 mt-8">
+                <Link to="/announcements" className="flex items-center justify-center p-6 bg-blue-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col items-center space-y-2">
+                        <FaBullhorn className="text-4xl text-blue-600" />
+                        <span className="text-lg font-semibold text-blue-800">Announcements</span>
+                    </div>
+                </Link>
+                <Link to="/feedback" className="flex items-center justify-center p-6 bg-green-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col items-center space-y-2">
+                        <FaComments className="text-4xl text-green-600" />
+                        <span className="text-lg font-semibold text-green-800">Feedback</span>
+                    </div>
+                </Link>
+            </div>
+
             <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 gap-8 px-4 max-w-6xl mx-auto">
                 {services.map((service) => (
                     <Link
@@ -682,6 +714,9 @@ function App() {
                 <Route path="/search" element={<SearchPage user={user} />} />
                 <Route path="/feedback" element={<FeedbackForm />} />
                 <Route path="/admin-feedback" element={<FeedbackPage user={user} />} />
+                {/* NEW ROUTES FOR ANNOUNCEMENTS */}
+                <Route path="/announcements" element={<AnnouncementList />} />
+                <Route path="/add-announcement" element={<AnnouncementForm />} />
             </Routes>
         </Router>
     );

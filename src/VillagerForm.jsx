@@ -10,7 +10,6 @@ function VillagerForm() {
     const [address, setAddress] = useState('');
     const [age, setAge] = useState('');
     const [dob, setDob] = useState('');
-    const [locationLink, setLocationLink] = useState(''); // Added location link state
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -24,7 +23,6 @@ function VillagerForm() {
                 address,
                 age,
                 dob,
-                locationLink, // Added location link to the data object
             };
             await addDoc(collection(db, 'villagers'), villagerData);
             alert('Details added successfully!');
@@ -93,15 +91,6 @@ function VillagerForm() {
                             type="date"
                             value={dob}
                             onChange={(e) => setDob(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-md"
-                        />
-                    </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 font-bold mb-2">Location Link</label>
-                        <input
-                            type="url"
-                            value={locationLink}
-                            onChange={(e) => setLocationLink(e.target.value)}
                             className="w-full px-3 py-2 border rounded-md"
                         />
                     </div>
