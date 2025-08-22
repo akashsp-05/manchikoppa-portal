@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
-import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn } from "react-icons/fa";
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "./firebase";
 import { collection, query, where, getDocs, deleteDoc, doc, addDoc } from "firebase/firestore";
@@ -9,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import myPhoto from './myphoto.jpg';
 import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
+import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock } from "react-icons/fa";
 
 // All components are combined into this single file for simplicity.
 
@@ -702,10 +702,27 @@ const services = [
     { id: 11, name: "Temple", kannada: "ದೇವಸ್ಥಾನ", icon: <FaLandmark />, color: "bg-orange-600" },
     { id: 12, name: "Milk Dairy", kannada: "ಹಾಲಿನ ಡೈರಿ", icon: <FaIndustry />, color: "bg-gray-400" },
 ];
-
 function HomePage({ user }) {
-    const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
+    const [currentTime, setCurrentTime] = useState("");
+    const [currentDate, setCurrentDate] = useState("");
+
+    useEffect(() => {
+        const updateDateTime = () => {
+            const now = new Date();
+            const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' };
+
+            setCurrentTime(now.toLocaleTimeString('en-US', timeOptions));
+            setCurrentDate(now.toLocaleDateString('en-US', dateOptions));
+        };
+
+        updateDateTime();
+        const timer = setInterval(updateDateTime, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
     const services = [
         { id: 1, name: "Shops", kannada: "ಅಂಗಡಿಗಳು", icon: <FaStore />, to: "/business/Shops", color: "bg-blue-500" },
         { id: 2, name: "Schools", kannada: "ಶಾಲಾ-ಕಾಲೇಜು", icon: <FaSchool />, to: "/business/Schools", color: "bg-green-500" },
@@ -720,12 +737,6 @@ function HomePage({ user }) {
         { id: 11, name: "Temple", kannada: " ದೇವಸ್ಥಾನ ", icon: <FaLandmark />, to: "/business/Temple", color: "bg-orange-600" },
         { id: 12, name: "Milk Dairy", kannada: " ಹಾಲಿನ ಡೈರಿ ", icon: <FaIndustry />, to: "/business/Milk Dairy", color: "bg-blue-800" },
     ];
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (searchQuery.trim() !== "") {
-            navigate(`/search?q=${searchQuery}`);
-        }
-    };
 
     const handleLogout = async () => {
         try {
@@ -750,18 +761,13 @@ function HomePage({ user }) {
                             <span>Complaint</span>
                         </Link>
                     </div>
-                    <form onSubmit={handleSearch} className="relative z-50 flex items-center">
-                        <input
-                            type="text"
-                            placeholder="Search by name..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="p-3 rounded-full w-48 border-2 border-transparent focus:border-blue-300 text-black focus:outline-none transition-all duration-300 shadow-inner"
-                        />
-                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors duration-300 ml-2">
-                            Search
-                        </button>
-                    </form>
+                    {/* Search button, now a standalone button */}
+                    <button 
+                        onClick={() => navigate('/search')} 
+                        className="bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors duration-300"
+                    >
+                        Search
+                    </button>
                     {/* Photo and Admin Login button on the right, stacked vertically */}
                     <div className="flex flex-col items-end space-y-2">
                         {user ? (
@@ -769,24 +775,24 @@ function HomePage({ user }) {
                                 <button onClick={handleLogout} className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
                                     Logout
                                 </button>
-                            </>
+                        </>
                         ) : (
                             <>
                                 <img
                                     src={myPhoto}
                                     alt="Admin Profile"
-                                    className="w-8 h-8 rounded-full"
+                                    className="w-6 h-6 rounded-full"
                                 />
                                 <Link to="/admin-login" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
                                     Admin Login
                                 </Link>
-                            </>
+                        </>
                         )}
-                    </div>
                 </div>
-                <div className="flex flex-col items-center mt-4">
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center text-yellow-300 tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
-                        Welcome to Manchikoppa Village
+            </div>
+            <div className="flex flex-col items-center mt-4">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center text-yellow-300 tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
+                    Welcome to Manchikoppa Village
                     </h1>
                     <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold mt-2 text-center text-white tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
                         ಮಂಚಿಕೊಪ್ಪ ಗ್ರಾಮಕ್ಕೆ ಸುಸ್ವಾಗತ
@@ -816,6 +822,45 @@ function HomePage({ user }) {
                 )}
             </div>
 
+            {/* New Comprehensive Village Details Box */}
+            <div className="flex justify-center mt-8 px-4">
+                <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Manchikoppa</h3>
+                    <div className="text-gray-600 space-y-2">
+                        <p className="font-semibold text-sm">{ "Karnataka >> Shimoga >> Shikarpur" }</p>
+                        <p className="text-sm">Locality Name: Manchikoppa (3)</p>
+                        <p className="text-sm">Taluk Name: Shikarpur</p>
+                        <p className="text-sm">District: Shimoga</p>
+                        <p className="text-sm">State: Karnataka</p>
+                        <p className="text-sm">Division: Bangalore</p>
+                        <p className="text-sm">Language: Kannada and Urdu</p>
+                        <div className="flex items-center space-x-2 text-sm mt-4">
+                            <FaClock className="text-blue-500" />
+                            <span>Current Time: {currentTime} (IST)</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm">
+                            <FaCalendarAlt className="text-green-500" />
+                            <span>Date: {currentDate}</span>
+                        </div>
+                        <p className="text-sm">Time zone: IST (UTC+5:30)</p>
+                        <p className="text-sm">Elevation / Altitude: 661 meters. Above Seal level</p>
+                        <p className="text-sm">Telephone Code / Std Code: 08187</p>
+                        <p className="text-sm">Assembly constituency: Shikaripura assembly. constituency</p>
+                        <p className="text-sm">Assembly MLA: Vijayendra Yediyurappa</p>
+                        <p className="text-sm">Lok Sabha constituency: Shimoga parliamentary. constituency</p>
+                        <p className="text-sm">Parliament MP: B.Y.RAGHAVENDRA.</p>
+                        <p className="text-sm">Serpanch Name: Karibasappa</p>
+                        <div className="flex items-center space-x-4 mt-4">
+                            <a href="#" className="text-sm text-blue-500 hover:underline">Update/Correct</a>
+                            <p className="text-sm">Pin Code: 577428</p>
+                            <a href="#" className="text-sm text-red-500 hover:underline">Correct Pin Code, if wrong</a>
+                        </div>
+                        <p className="text-sm">Post Office Name: Shiralakoppa</p>
+                        <p className="text-sm mt-4">Commodities Prices: <a href="#" className="text-blue-500 hover:underline">Hirekerur Market / Mandi</a></p>
+                    </div>
+                </div>
+            </div>
+
             <div className="flex justify-center space-x-4 mt-8">
                 <Link to="/announcements" className="flex items-center justify-center p-6 bg-blue-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
                     <div className="flex flex-col items-center space-y-2">
@@ -823,12 +868,18 @@ function HomePage({ user }) {
                         <span className="text-lg font-semibold text-blue-800">Announcements</span>
                     </div>
                 </Link>
-                <Link to="/feedback" className="flex items-center justify-center p-6 bg-green-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <div className="flex flex-col items-center space-y-2">
-                        <FaComments className="text-4xl text-green-600" />
-                        <span className="text-lg font-semibold text-green-800">Feedback</span>
-                    </div>
-                </Link>
+                <Link to="/videos" className="flex items-center justify-center p-6 bg-purple-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col items-center space-y-2">
+                        <FaPlayCircle className="text-4xl text-purple-600" />
+                        <span className="text-lg font-semibold text-purple-800">Village Videos</span>
+                    </div>
+                </Link>
+                <Link to="/pravasi-bandu" className="flex items-center justify-center p-6 bg-orange-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col items-center space-y-2">
+                        <FaGlobe className="text-4xl text-orange-600" />
+                        <span className="text-lg font-semibold text-orange-800">Pravasi Bandu</span>
+                    </div>
+                </Link>
             </div>
 
             <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 gap-8 px-4 max-w-6xl mx-auto">
