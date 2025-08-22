@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
-import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge } from "react-icons/fa";
+import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn } from "react-icons/fa";
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "./firebase";
 import { collection, query, where, getDocs, deleteDoc, doc, addDoc } from "firebase/firestore";
@@ -11,6 +11,7 @@ import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
 
 // All components are combined into this single file for simplicity.
+
 const storage = getStorage();
 
 function AdminLogin() {
@@ -31,55 +32,46 @@ function AdminLogin() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl border border-gray-200">
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
                 <img
                     src={myPhoto}
                     alt="Admin Profile"
-                    className="w-24 h-24 rounded-full mx-auto mb-4 border-4 border-gray-300 shadow-md"
+                    className="w-24 h-24 rounded-full mx-auto mb-4"
                 />
-                <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                    Admin Login
-                </h2>
-                <form onSubmit={handleLogin} className="mt-8 space-y-6">
-                    <div className="rounded-md shadow-sm">
-                        <div>
-                            <label className="sr-only" htmlFor="email">Email address</label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="appearance-none rounded-t-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm transition-all"
-                                placeholder="Email address"
-                            />
-                        </div>
-                        <div>
-                            <label className="sr-only" htmlFor="password">Password</label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="appearance-none rounded-b-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm transition-all"
-                                placeholder="Password"
-                            />
-                        </div>
+                <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">Admin Login</h2>
+                <form onSubmit={handleLogin}>
+                    <div className="mb-4">
+                        <label className="block text-gray-700 font-bold mb-2" htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
                     </div>
-                    <div>
-                        <button
-                            type="submit"
-                            className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 shadow-lg transform hover:scale-105"
-                        >
-                            Login
-                        </button>
+                    <div className="mb-6">
+                        <label className="block text-gray-700 font-bold mb-2" htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
                     </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+                    >
+                        Login
+                    </button>
+                    <p className="mt-4 text-center text-gray-500 text-sm">
+                        <a href="#" className="underline hover:text-blue-500">Forgot your password?</a>
+                    </p>
                 </form>
             </div>
         </div>
@@ -113,6 +105,7 @@ function VillagerForm() {
                 await uploadBytes(photoRef, photoFile);
                 photoURL = await getDownloadURL(photoRef);
             }
+
             const villagerData = {
                 ...formData,
                 lowercaseName: formData.name.toLowerCase(),
@@ -130,47 +123,45 @@ function VillagerForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-3xl">
-                <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">Add Villager Details</h2>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-gray-700 font-medium mb-1">Name</label>
-                            <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
-                        </div>
-                        <div>
-                            <label className="block text-gray-700 font-medium mb-1">Phone</label>
-                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
-                        </div>
-                        <div>
-                            <label className="block text-gray-700 font-medium mb-1">Work</label>
-                            <input type="text" name="work" value={formData.work} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
-                        </div>
-                        <div>
-                            <label className="block text-gray-700 font-medium mb-1">Address</label>
-                            <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
-                        </div>
-                        <div>
-                            <label className="block text-gray-700 font-medium mb-1">Age</label>
-                            <input type="number" name="age" value={formData.age} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
-                        </div>
-                        <div>
-                            <label className="block text-gray-700 font-medium mb-1">Date of Birth</label>
-                            <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
-                        </div>
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+                <h2 className="text-2xl font-bold text-center mb-6">Add Villager Details</h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-gray-700">Name</label>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-1">Google Maps Live Location Link</label>
-                        <input type="url" name="locationLink" value={formData.locationLink} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" placeholder="e.g., https://goo.gl/maps/..." />
+                        <label className="block text-gray-700">Phone</label>
+                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-1">Profile Photo</label>
-                        <input type="file" onChange={handlePhotoChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" accept="image/*" />
+                        <label className="block text-gray-700">Work</label>
+                        <input type="text" name="work" value={formData.work} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Address</label>
+                        <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Age</label>
+                        <input type="number" name="age" value={formData.age} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Date of Birth</label>
+                        <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Google Maps Live Location Link</label>
+                        <input type="url" name="locationLink" value={formData.locationLink} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" placeholder="e.g., https://goo.gl/maps/..." />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Profile Photo</label>
+                        <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 transform hover:scale-105 shadow-lg mt-6"
+                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
                     >
                         Save Details
                     </button>
@@ -216,40 +207,39 @@ function BusinessPage({ user }) {
     };
 
     return (
-        <div className="p-8 max-w-7xl mx-auto bg-gray-100 min-h-screen">
-            <h2 className="text-4xl font-extrabold mb-8 text-center text-gray-900 capitalize">{businessType} Details</h2>
+        <div className="p-8 max-w-5xl mx-auto">
+            <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">{businessType} Details</h2>
             {user && (
-                <Link to={`/add-business-details/${businessType}`} className="px-6 py-3 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105 mb-6 inline-block">
-                    Add New {businessType}
-                </Link>
+                <Link to={`/add-business-details/${businessType}`} className="px-4 py-2 bg-green-500 text-white rounded-lg mb-4 inline-block">Add New {businessType}</Link>
             )}
+
             {isLoading ? (
-                <p className="text-center text-gray-500 text-xl font-semibold mt-12">Loading...</p>
+                <p className="text-center text-gray-500">Loading...</p>
             ) : businesses.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {businesses.map((biz) => (
-                        <div key={biz.id} className="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
+                        <div key={biz.id} className="bg-white p-6 rounded-lg shadow-md flex items-start space-x-4">
                             {biz.photoURL && (
                                 <img
                                     src={biz.photoURL}
                                     alt={`${biz.name} photo`}
-                                    className="w-full h-48 object-cover rounded-2xl mb-6 shadow-md"
+                                    className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
                                 />
                             )}
-                            <h3 className="font-bold text-2xl text-gray-800 mb-2">{biz.name}</h3>
-                            <div className="space-y-3 text-gray-600 w-full text-left mt-4">
-                                {biz.ownerName && <p><FaUser className="inline-block mr-3 text-green-500" />Owner/Principal: <span className="font-semibold text-gray-800">{biz.ownerName}</span></p>}
-                                {biz.phone && <p><FaPhone className="inline-block mr-3 text-green-500" />Phone: <span className="font-semibold text-gray-800">{biz.phone}</span></p>}
-                                {biz.address && <p><FaMapMarkerAlt className="inline-block mr-3 text-green-500" />Address: <span className="font-semibold text-gray-800">{biz.address}</span></p>}
-                                {biz.specification && <p><FaIdBadge className="inline-block mr-3 text-green-500" />Specification: <span className="font-semibold text-gray-800">{biz.specification}</span></p>}
-                                {biz.locationLink && <p className="text-center mt-6"><a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-green-600 font-semibold hover:underline">View on Map</a></p>}
+                            <div className="flex-1">
+                                <h3 className="font-bold text-xl text-blue-700 mb-2">{biz.name}</h3>
+                                {biz.ownerName && <p className="text-gray-700 text-sm">Owner/Principal: <span className="font-semibold">{biz.ownerName}</span></p>}
+                                {biz.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{biz.phone}</span></p>}
+                                {biz.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{biz.address}</span></p>}
+                                {biz.specification && <p className="text-gray-700 text-sm">Specification: <span className="font-semibold">{biz.specification}</span></p>}
+                                {biz.locationLink && <p className="text-gray-700 text-sm">Location: <a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
                                 {biz.members && biz.members.length > 0 && (
-                                    <div className="mt-4 border-t border-gray-200 pt-4">
-                                        <h4 className="font-semibold text-lg text-gray-700 mb-2">Staff/Members:</h4>
-                                        <ul className="list-none space-y-2">
+                                    <div className="mt-4">
+                                        <h4 className="font-semibold text-lg text-blue-600">Staff/Members:</h4>
+                                        <ul className="list-disc list-inside space-y-1">
                                             {biz.members.map((member, idx) => (
                                                 <li key={idx}>
-                                                    <span className="font-medium text-gray-800">{member.name}</span> - {member.work} ({member.phone})
+                                                    <span className="font-medium">{member.name}</span> - {member.work} ({member.phone})
                                                 </li>
                                             ))}
                                         </ul>
@@ -257,7 +247,7 @@ function BusinessPage({ user }) {
                                 )}
                             </div>
                             {user && (
-                                <button onClick={() => handleDeleteBusiness(biz.id)} className="mt-6 flex items-center space-x-2 bg-red-600 text-white py-3 px-6 rounded-full shadow-md hover:bg-red-700 transition duration-200 transform hover:scale-105">
+                                <button onClick={() => handleDeleteBusiness(biz.id)} className="flex items-center space-x-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-200 text-sm">
                                     <FaTrash />
                                     <span>Delete</span>
                                 </button>
@@ -266,7 +256,7 @@ function BusinessPage({ user }) {
                     ))}
                 </div>
             ) : (
-                <p className="text-center text-gray-500 text-xl font-semibold mt-12">No {businessType} details found.</p>
+                <p className="text-center text-gray-500">No {businessType} details found.</p>
             )}
         </div>
     );
@@ -378,73 +368,67 @@ function BusinessForm() {
     const individualProfessions = ["Electrician", "Doctors", "Engineers", "Teachers"];
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center py-10 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-3xl">
-                <h2 className="text-3xl font-bold text-center mb-8 text-gray-900">Add {businessType} Details</h2>
-                <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+                <h2 className="text-2xl font-bold text-center mb-6">Add {businessType} Details</h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-gray-700 font-medium mb-1">
+                        <label className="block text-gray-700">
                             {isTemple ? "Temple Name" : (individualProfessions.includes(businessType) ? "Name" : `${businessType} Name`)}
                         </label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
+                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     {hasOwner && !isGramaPanchayat && (
                         <div>
-                            <label className="block text-gray-700 font-medium mb-1">
+                            <label className="block text-gray-700">
                                 {businessType === "Schools" ? "Principal Name" : "Owner Name"}
                             </label>
-                            <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
+                            <input type="text" name="ownerName" value={formData.ownerName} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                         </div>
                     )}
                     {(hasOwner || hasSpecification) && (
                         <div>
-                            <label className="block text-gray-700 font-medium mb-1">Phone Number</label>
-                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
+                            <label className="block text-gray-700">Phone Number</label>
+                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                         </div>
                     )}
                     {hasSpecification && (
                         <div>
-                            <label className="block text-gray-700 font-medium mb-1">Specification</label>
-                            <input type="text" name="specification" value={formData.specification} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
+                            <label className="block text-gray-700">Specification</label>
+                            <input type="text" name="specification" value={formData.specification} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                         </div>
                     )}
                     <div>
-                        <label className="block text-gray-700 font-medium mb-1">Address</label>
-                        <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
+                        <label className="block text-gray-700">Address</label>
+                        <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-1">Location Link</label>
-                        <input type="url" name="locationLink" value={formData.locationLink} onChange={handleChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" />
+                        <label className="block text-gray-700">Location Link</label>
+                        <input type="url" name="locationLink" value={formData.locationLink} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
                     </div>
                     <div>
-                        <label className="block text-gray-700 font-medium mb-1">Business/Service Photo</label>
-                        <input type="file" onChange={handlePhotoChange} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all" accept="image/*" />
+                        <label className="block text-gray-700">Business/Service Photo</label>
+                        <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
                     </div>
                     {hasMembers && (
-                        <div className="space-y-6 mt-6">
+                        <div>
                             {formData.members.map((member, index) => (
-                                <div key={index} className="border border-gray-200 p-6 rounded-xl relative bg-gray-50 shadow-inner">
-                                    <h4 className="font-bold text-lg text-gray-800 mb-4">Staff/Member {index + 1}</h4>
-                                    <div className="space-y-4">
-                                        <input type="text" name="name" placeholder="Name" value={member.name} onChange={(e) => handleMemberChange(index, e)} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
-                                        <input type="text" name="work" placeholder="Work" value={member.work} onChange={(e) => handleMemberChange(index, e)} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
-                                        <input type="tel" name="phone" placeholder="Phone" value={member.phone} onChange={(e) => handleMemberChange(index, e)} className="w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                                <div key={index} className="border p-4 rounded-md relative mt-4">
+                                    <h4 className="font-semibold">Staff/Member {index + 1}</h4>
+                                    <div className="space-y-2 mt-2">
+                                        <input type="text" name="name" placeholder="Name" value={member.name} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" />
+                                        <input type="text" name="work" placeholder="Work" value={member.work} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" />
+                                        <input type="tel" name="phone" placeholder="Phone" value={member.phone} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" />
                                     </div>
                                     {formData.members.length > 1 && (
-                                        <button type="button" onClick={() => handleRemoveMember(index)} className="absolute top-4 right-4 text-red-500 hover:text-red-700 transition duration-200 text-sm font-semibold">
-                                            <FaTrash className="inline-block mr-1" /> Remove
-                                        </button>
+                                        <button type="button" onClick={() => handleRemoveMember(index)} className="absolute top-2 right-2 text-red-500 hover:text-red-700">Remove</button>
                                     )}
                                 </div>
                             ))}
-                            <button type="button" onClick={handleAddMember} className="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition duration-300 shadow-md transform hover:scale-105">
-                                Add Another Staff/Member
-                            </button>
+                            <button type="button" onClick={handleAddMember} className="w-full bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300 mt-4">Add Another Staff/Member</button>
                         </div>
                     )}
-                    <button type="submit" className="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 transform hover:scale-105 shadow-lg mt-6">
-                        Save Details
-                    </button>
+                    <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 mt-4">Save Details</button>
                 </form>
             </div>
         </div>
@@ -456,8 +440,8 @@ function SearchPage({ user }) {
     const [isLoading, setIsLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
-    const { q } = useParams();
 
+    const { q } = useParams();
     useEffect(() => {
         if (q) {
             setSearchQuery(q);
@@ -489,67 +473,60 @@ function SearchPage({ user }) {
         }
     };
 
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            navigate(`/search/${searchQuery}`);
-        }
-    };
-
     const handleDeleteVillager = async (id) => {
         if (window.confirm("Are you sure you want to delete this villager's details?")) {
             try {
                 await deleteDoc(doc(db, "villagers", id));
-                alert("Villager details deleted successfully!");
+                alert("Details deleted successfully!");
                 setSearchResults(searchResults.filter(villager => villager.id !== id));
             } catch (error) {
                 console.error("Error deleting villager:", error);
-                alert("Failed to delete villager details. Please try again.");
+                alert("Failed to delete details. Please try again.");
             }
         }
     };
 
     return (
-        <div className="p-8 max-w-7xl mx-auto bg-gray-100 min-h-screen">
-            <div className="flex justify-center mb-8">
-                <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Search villagers by name..."
-                    className="w-full max-w-xl px-5 py-3 border border-gray-300 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-                />
-                <button
-                    onClick={() => navigate(`/search/${searchQuery}`)}
-                    className="ml-4 px-6 py-3 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
-                >
-                    Search
-                </button>
+        <div className="p-8 max-w-4xl mx-auto min-h-screen">
+            <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Villager Details</h2>
+            <div className="mb-6">
+                <form onSubmit={(e) => { e.preventDefault(); handleSearch(searchQuery); }} className="flex">
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search by name..."
+                        className="flex-grow p-3 rounded-l-lg border-2 border-gray-300 focus:outline-none focus:border-blue-500"
+                    />
+                    <button type="submit" className="bg-blue-500 text-white p-3 rounded-r-lg hover:bg-blue-600 transition duration-300">
+                        Search
+                    </button>
+                </form>
             </div>
             {isLoading ? (
-                <p className="text-center text-gray-500 text-xl font-semibold mt-12">Loading...</p>
+                <p className="text-center text-gray-500">Loading...</p>
             ) : searchResults.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="space-y-4">
                     {searchResults.map((villager) => (
-                        <div key={villager.id} className="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
+                        <div key={villager.id} className="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
                             {villager.photoURL && (
                                 <img
                                     src={villager.photoURL}
-                                    alt={`${villager.name} photo`}
-                                    className="w-full h-48 object-cover rounded-2xl mb-6 shadow-md"
+                                    alt={`${villager.name}'s photo`}
+                                    className="w-20 h-20 rounded-full object-cover flex-shrink-0"
                                 />
                             )}
-                            <h3 className="font-bold text-2xl text-gray-800 mb-2">{villager.name}</h3>
-                            <div className="space-y-3 text-gray-600 w-full text-left mt-4">
-                                {villager.phone && <p><FaPhone className="inline-block mr-3 text-green-500" />Phone: <span className="font-semibold text-gray-800">{villager.phone}</span></p>}
-                                {villager.work && <p><FaBriefcase className="inline-block mr-3 text-green-500" />Work: <span className="font-semibold text-gray-800">{villager.work}</span></p>}
-                                {villager.address && <p><FaMapMarkerAlt className="inline-block mr-3 text-green-500" />Address: <span className="font-semibold text-gray-800">{villager.address}</span></p>}
-                                {villager.age && <p><FaUser className="inline-block mr-3 text-green-500" />Age: <span className="font-semibold text-gray-800">{villager.age}</span></p>}
-                                {villager.dob && <p><FaCalendarAlt className="inline-block mr-3 text-green-500" />DOB: <span className="font-semibold text-gray-800">{villager.dob}</span></p>}
-                                {villager.locationLink && <p className="text-center mt-6"><a href={villager.locationLink} target="_blank" rel="noopener noreferrer" className="text-green-600 font-semibold hover:underline">View on Map</a></p>}
+                            <div className="flex-1">
+                                <h3 className="font-bold text-xl text-blue-700">{villager.name}</h3>
+                                {villager.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{villager.phone}</span></p>}
+                                {villager.work && <p className="text-gray-700 text-sm">Work: <span className="font-semibold">{villager.work}</span></p>}
+                                {villager.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{villager.address}</span></p>}
+                                {villager.age && <p className="text-gray-700 text-sm">Age: <span className="font-semibold">{villager.age}</span></p>}
+                                {villager.dob && <p className="text-gray-700 text-sm">Date of Birth: <span className="font-semibold">{villager.dob}</span></p>}
+                                {villager.locationLink && <p className="text-gray-700 text-sm">Location: <a href={villager.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
                             </div>
                             {user && (
-                                <button onClick={() => handleDeleteVillager(villager.id)} className="mt-6 flex items-center space-x-2 bg-red-600 text-white py-3 px-6 rounded-full shadow-md hover:bg-red-700 transition duration-200 transform hover:scale-105">
+                                <button onClick={() => handleDeleteVillager(villager.id)} className="flex items-center space-x-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-200 text-sm">
                                     <FaTrash />
                                     <span>Delete</span>
                                 </button>
@@ -558,142 +535,338 @@ function SearchPage({ user }) {
                     ))}
                 </div>
             ) : (
-                <p className="text-center text-gray-500 text-xl font-semibold mt-12">No villagers found matching your search.</p>
+                <p className="text-center text-gray-500">No details found. Try a different name.</p>
             )}
         </div>
     );
 }
 
-function HomePage({ user }) {
-    const serviceLinks = [
-        { to: "/business/Shops", icon: FaStore, label: "Shops" },
-        { to: "/business/Schools", icon: FaSchool, label: "Schools" },
-        { to: "/business/Wine Shop", icon: FaWineBottle, label: "Wine Shop" },
-        { to: "/business/Rice Mill", icon: FaIndustry, label: "Rice Mill" },
-        { to: "/business/Temple", icon: FaLandmark, label: "Temple" },
-        { to: "/business/Electrician", icon: FaWrench, label: "Electrician" },
-        { to: "/business/Doctors", icon: FaStethoscope, label: "Doctors" },
-        { to: "/business/Engineers", icon: FaTools, label: "Engineers" },
-        { to: "/business/Teachers", icon: FaChalkboardTeacher, label: "Teachers" },
-        { to: "/business/Grama Panchayat", icon: FaComments, label: "Grama Panchayat" },
-        { to: "/announcements", icon: FaBullhorn, label: "Announcements" },
-    ];
+function FeedbackForm() {
+    const [name, setName] = useState("");
+    const [feedbackText, setFeedbackText] = useState("");
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (feedbackText.trim() === "" || name.trim() === "") {
+            alert("Please provide both your name and feedback before submitting.");
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "feedback"), {
+                name: name,
+                feedback: feedbackText,
+                timestamp: new Date(),
+            });
+            alert("Thank you for your feedback! It has been submitted.");
+            setName("");
+            setFeedbackText("");
+            navigate("/");
+        } catch (error) {
+            console.error("Error submitting feedback:", error);
+            alert("Failed to submit feedback. Please try again.");
+        }
+    };
+
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
-            <h1 className="text-5xl font-extrabold text-center text-gray-900 mb-4 tracking-tight">Manchikoppa Village Services</h1>
-            <p className="text-center text-lg text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-                Discover local services, villager information, and community announcements in one place.
-            </p>
-            {user && (
-                <div className="flex justify-center mb-10 space-x-4">
-                    <Link to="/villagers/add" className="px-8 py-4 bg-green-600 text-white font-bold rounded-full shadow-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105">
-                        Add Villager Details
-                    </Link>
-                </div>
-            )}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
-                {serviceLinks.map((link, index) => {
-                    const IconComponent = link.icon;
-                    return (
-                        <Link key={index} to={link.to} className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 text-center flex flex-col items-center transform hover:-translate-y-2 border border-gray-200">
-                            <IconComponent className="text-5xl text-green-500 mb-4 transition-transform duration-300 transform group-hover:scale-110" />
-                            <span className="font-bold text-lg text-gray-800">{link.label}</span>
-                        </Link>
-                    );
-                })}
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+                <h2 className="text-2xl font-bold text-center mb-2">Send Feedback or Complain</h2>
+                <p className="text-sm text-center text-gray-500 mb-6">ಪ್ರತಿಕ್ರಿಯೆ ಅಥವಾ ದೂರು ಕಳುಹಿಸಿ</p>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-gray-700">Your Name</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Your Feedback or Complain</label>
+                        <textarea
+                            name="feedback"
+                            rows="6"
+                            value={feedbackText}
+                            onChange={(e) => setFeedbackText(e.target.value)}
+                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                        ></textarea>
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+                    >
+                        Submit Feedback
+                    </button>
+                </form>
             </div>
         </div>
     );
 }
 
-function Layout({ children, user, isAdmin }) {
+function FeedbackPage({ user }) {
+    const [feedbackList, setFeedbackList] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchFeedback = async () => {
+            if (!user) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "feedback"));
+                const list = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    timestamp: doc.data().timestamp.toDate()
+                }));
+                setFeedbackList(list);
+            } catch (error) {
+                console.error("Error fetching feedback:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchFeedback();
+    }, [user]);
+
+    const handleDeleteFeedback = async (id) => {
+        if (window.confirm("Are you sure you want to delete this feedback?")) {
+            try {
+                await deleteDoc(doc(db, "feedback", id));
+                alert("Feedback deleted successfully!");
+                setFeedbackList(feedbackList.filter(item => item.id !== id));
+            } catch (error) {
+                console.error("Error deleting feedback:", error);
+                alert("Failed to delete feedback. Please try again.");
+            }
+        }
+    };
+
+    if (!user) {
+        return <div className="min-h-screen flex items-center justify-center"><p className="text-xl text-gray-500">Access Denied. Please log in as an admin.</p></div>;
+    }
+
+    if (isLoading) {
+        return <div className="min-h-screen flex items-center justify-center"><p className="text-xl text-gray-500">Loading feedback...</p></div>;
+    }
+
+    return (
+        <div className="p-8 max-w-4xl mx-auto min-h-screen">
+            <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Admin Feedback Dashboard</h2>
+            {feedbackList.length > 0 ? (
+                <div className="space-y-4">
+                    {feedbackList.map((feedbackItem) => (
+                        <div key={feedbackItem.id} className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                            <h3 className="font-semibold text-lg text-blue-700 mb-2">From: {feedbackItem.name}</h3>
+                            <p className="text-gray-800 mb-4">{feedbackItem.feedback}</p>
+                            <div className="flex justify-between items-center text-sm text-gray-500 border-t pt-4">
+                                <span>{feedbackItem.timestamp.toLocaleString()}</span>
+                                <button
+                                    onClick={() => handleDeleteFeedback(feedbackItem.id)}
+                                    className="flex items-center space-x-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-200"
+                                >
+                                    <FaTrash />
+                                    <span>Delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-center text-gray-500 text-lg">No feedback has been submitted yet.</p>
+            )}
+        </div>
+    );
+}
+
+const services = [
+    { id: 1, name: "Grama Panchayat", kannada: "ಗ್ರಾಮ ಪಂಚಾಯತ್", icon: <FaLandmark />, color: "bg-yellow-400" },
+    { id: 2, name: "Shops", kannada: "ಅಂಗಡಿಗಳು", icon: <FaStore />, color: "bg-green-400" },
+    { id: 3, name: "Schools", kannada: "ಶಾಲೆಗಳು", icon: <FaSchool />, color: "bg-blue-400" },
+    { id: 4, name: "Wine Shop", kannada: "ವೈನ್ ಶಾಪ್", icon: <FaWineBottle />, color: "bg-purple-400" },
+    { id: 5, name: "Rice Mill", kannada: "ಅಕ್ಕಿ ಗಿರಣಿ", icon: <FaIndustry />, color: "bg-red-400" },
+    { id: 6, name: "Interlock Factory", kannada: "ಇಂಟರ್ಲಾಕ್ ಕಾರ್ಖಾನೆ", icon: <FaIndustry />, color: "bg-gray-600" },
+    { id: 7, name: "Electrician", kannada: "ವಿದ್ಯುತ್ ತಂತ್ರಜ್ಞ", icon: <FaWrench />, color: "bg-orange-500" },
+    { id: 8, name: "Doctors", kannada: "ವೈದ್ಯರು", icon: <FaStethoscope />, color: "bg-red-500" },
+    { id: 9, name: "Engineers", kannada: "ಎಂಜಿನಿಯರ್‌ಗಳು", icon: <FaTools />, color: "bg-purple-700" },
+    { id: 10, name: "Teachers", kannada: "ಶಿಕ್ಷಕರು", icon: <FaChalkboardTeacher />, color: "bg-indigo-500" },
+    { id: 11, name: "Temple", kannada: "ದೇವಸ್ಥಾನ", icon: <FaLandmark />, color: "bg-orange-600" },
+    { id: 12, name: "Milk Dairy", kannada: "ಹಾಲಿನ ಡೈರಿ", icon: <FaIndustry />, color: "bg-gray-400" },
+];
+
+function HomePage({ user }) {
+    const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim() !== "") {
+            navigate(`/search?q=${searchQuery}`);
+        }
+    };
 
     const handleLogout = async () => {
         try {
             await signOut(auth);
-            navigate("/admin-login");
+            alert("Logged out successfully!");
+            navigate("/");
         } catch (error) {
             console.error("Error logging out:", error);
         }
     };
-    const showSearch = !window.location.pathname.startsWith('/search');
 
     return (
-        <div className="flex flex-col min-h-screen">
-            <header className="bg-white text-gray-900 p-6 shadow-md sticky top-0 z-50 border-b border-gray-200">
-                <div className="container mx-auto flex justify-between items-center">
-                    <Link to="/" className="text-2xl font-bold tracking-tight hover:text-gray-700 transition-colors">
-                        Manchikoppa
-                    </Link>
-                    <div className="flex items-center space-x-6">
-                        {showSearch && (
-                            <Link to="/search" className="text-gray-600 hover:text-gray-900 transition-colors">
-                                Search Villagers
-                            </Link>
-                        )}
-                        {isAdmin ? (
-                            <div className="flex items-center space-x-4">
-                                <span className="font-medium text-gray-500">Admin</span>
-                                <button onClick={handleLogout} className="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-full shadow hover:bg-gray-300 transition-colors">
+        <div className="min-h-screen bg-gray-50 font-sans">
+            <header className="sticky top-0 z-40 bg-gradient-to-r from-blue-900 to-blue-700 text-white flex flex-col items-center p-6 shadow-2xl">
+                <div className="flex items-center space-x-6 w-full justify-between mb-4">
+                    <div className="flex items-center space-x-4">
+                        <Link to="/add-villager-details" className="bg-gradient-to-r from-yellow-400 to-yellow-300 text-blue-900 px-6 py-2 rounded-full shadow-lg font-bold hover:scale-105 transition-transform duration-300">
+                            Add Details
+                        </Link>
+                    </div>
+                    <form onSubmit={handleSearch} className="relative z-50 flex items-center">
+                        <input
+                            type="text"
+                            placeholder="Search by name..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="p-3 rounded-full w-48 border-2 border-transparent focus:border-blue-300 text-black focus:outline-none transition-all duration-300 shadow-inner"
+                        />
+                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors duration-300 ml-2">
+                            Search
+                        </button>
+                    </form>
+                    <div className="flex items-center space-x-2">
+                        {user ? (
+                            <>
+                                <Link to="/admin-feedback" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300 flex items-center space-x-2">
+                                    <FaComments />
+                                    <span>Feedback or Complain</span>
+                                </Link>
+                                <button onClick={handleLogout} className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
                                     Logout
                                 </button>
-                            </div>
-                        ) : user ? (
-                            <button onClick={handleLogout} className="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-full shadow hover:bg-gray-300 transition-colors">
-                                Logout
-                            </button>
+                            </>
                         ) : (
-                            <Link to="/admin-login" className="bg-green-600 text-white font-bold py-2 px-4 rounded-full shadow hover:bg-green-700 transition-colors">
-                                Admin Login
-                            </Link>
+                            <>
+                                <Link to="/feedback" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300 flex items-center space-x-2">
+                                    <FaComments />
+                                    <span>Feedback or Complain</span>
+                                </Link>
+                                <img
+                                    src={myPhoto}
+                                    alt="Admin Profile"
+                                    className="w-8 h-8 rounded-full"
+                                />
+                                <Link to="/admin-login" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
+                                    Admin Login
+                                </Link>
+                            </>
                         )}
                     </div>
                 </div>
-            </header>
-            <main className="flex-1">
-                {children}
-            </main>
-            <footer className="bg-gray-800 text-white p-6 text-center shadow-inner">
-                <div className="container mx-auto">
-                    <p className="text-sm text-gray-400">&copy; 2024 Manchikoppa Village Services. All Rights Reserved.</p>
+                <div className="flex flex-col items-center mt-4">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center text-yellow-300 tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
+                        Welcome to Manchikoppa Village
+                    </h1>
+                    <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold mt-2 text-center text-white tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
+                        ಮಂಚಿಕೊಪ್ಪ ಗ್ರಾಮಕ್ಕೆ ಸುಸ್ವಾಗತ
+                    </p>
+                    <p className="text-lg sm:text-xl text-white mt-2 text-center">
+                        Manchikoppa (post&village), Shikaripura (Taluk), Shimoga (District), Karnataka, 577428
+                    </p>
+                    <p className="text-lg sm:text-xl text-white text-center">
+                        ಮಂಚಿಕೊಪ್ಪ (ಪೋಸ್ಟ್ ಮತ್ತು ಗ್ರಾಮ), ಶಿಕಾರಿಪುರ (ತಾಲ್ಲೂಕು), ಶಿವಮೊಗ್ಗ (ಜಿಲ್ಲೆ), ಕರ್ನಾಟಕ, 577428
+                    </p>
                 </div>
-            </footer>
+            </header>
+            <div className="mt-8 flex justify-center px-4">
+                <img src="/village.png" alt="Village Banner" className="w-1/2 max-w-lg rounded-full shadow-2xl object-cover border-4 border-blue-500" />
+            </div>
+
+            <div className="flex justify-center flex-col items-center mt-8 p-4 bg-gray-200 rounded-lg max-w-lg mx-auto shadow-inner">
+                <h2 className="text-3xl font-bold text-blue-800 mb-4">Village Announcements</h2>
+                <Link to="/announcements" className="text-lg text-blue-500 hover:underline">
+                    Click here to see all announcements.
+                </Link>
+                {user && (
+                    <Link to="/add-announcement" className="mt-4 flex items-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300 shadow-md">
+                        <FaBullhorn />
+                        <span>Add New Announcement</span>
+                    </Link>
+                )}
+            </div>
+
+            <div className="flex justify-center space-x-4 mt-8">
+                <Link to="/announcements" className="flex items-center justify-center p-6 bg-blue-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col items-center space-y-2">
+                        <FaBullhorn className="text-4xl text-blue-600" />
+                        <span className="text-lg font-semibold text-blue-800">Announcements</span>
+                    </div>
+                </Link>
+                <Link to="/feedback" className="flex items-center justify-center p-6 bg-green-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col items-center space-y-2">
+                        <FaComments className="text-4xl text-green-600" />
+                        <span className="text-lg font-semibold text-green-800">Feedback</span>
+                    </div>
+                </Link>
+            </div>
+
+            <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 gap-8 px-4 max-w-6xl mx-auto">
+                {services.map((service) => (
+                    <Link
+                        key={service.id}
+                        to={`/business/${service.name}`}
+                        className="group bg-white rounded-3xl p-8 text-center shadow-lg hover:shadow-2xl hover:scale-105 transform transition duration-300"
+                    >
+                        <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${service.color} text-3xl text-white group-hover:bg-opacity-80 transition duration-300`}>
+                            {service.icon}
+                        </div>
+                        <h2 className="text-2xl font-bold text-blue-800 mt-4 group-hover:text-blue-600 transition duration-300">{service.name} <br /><span className="text-lg text-green-700 font-normal">{service.kannada}</span></h2>
+                        <p className="text-sm text-gray-500 mt-2">Click to view details</p>
+                    </Link>
+                ))}
+            </div>
+            <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
+                <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details</h3>
+                <p className="text-gray-500 text-center text-lg mt-8">Click on the Search button above to search villager details.</p>
+            </div>
         </div>
     );
 }
 
 function App() {
     const [user, setUser] = useState(null);
-    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+        onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-            if (currentUser && currentUser.email === "admin@gmail.com") {
-                setIsAdmin(true);
-            } else {
-                setIsAdmin(false);
-            }
         });
-        return () => unsubscribe();
     }, []);
 
     return (
         <Router>
-            <Layout user={user} isAdmin={isAdmin}>
-                <Routes>
-                    <Route path="/" element={<HomePage user={user} />} />
-                    <Route path="/admin-login" element={<AdminLogin />} />
-                    <Route path="/villagers/add" element={<VillagerForm />} />
-                    <Route path="/business/:businessType" element={<BusinessPage user={user} />} />
-                    <Route path="/add-business-details/:businessType" element={<BusinessForm />} />
-                    <Route path="/search" element={<SearchPage user={user} />} />
-                    <Route path="/search/:q" element={<SearchPage user={user} />} />
-                    <Route path="/announcements" element={<AnnouncementList user={user} />} />
-                    <Route path="/announcements/add" element={<AnnouncementForm />} />
-                </Routes>
-            </Layout>
+            <Routes>
+                <Route path="/" element={<HomePage user={user} />} />
+                <Route path="/add-villager-details" element={<VillagerForm />} />
+                <Route path="/business/:businessType" element={<BusinessPage user={user} />} />
+                <Route path="/add-business-details/:businessType" element={<BusinessForm />} />
+                <Route path="/admin-login" element={<AdminLogin />} />
+                <Route path="/search" element={<SearchPage user={user} />} />
+                <Route path="/feedback" element={<FeedbackForm />} />
+                <Route path="/admin-feedback" element={<FeedbackPage user={user} />} />
+                <Route path="/announcements" element={<AnnouncementList />} />
+                <Route path="/add-announcement" element={<AnnouncementForm />} />
+            </Routes>
         </Router>
     );
 }
