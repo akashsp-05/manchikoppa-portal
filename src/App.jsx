@@ -704,146 +704,155 @@ const services = [
 ];
 
 function HomePage({ user }) {
-    const [searchQuery, setSearchQuery] = useState("");
-    const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
+    const services = [
+        { id: 1, name: "Shops", kannada: "ಅಂಗಡಿಗಳು", icon: <FaStore />, to: "/business/Shops", color: "bg-blue-500" },
+        { id: 2, name: "Schools", kannada: "ಶಾಲಾ-ಕಾಲೇಜು", icon: <FaSchool />, to: "/business/Schools", color: "bg-green-500" },
+        { id: 3, name: "Wine Shop", kannada: " ಮದ್ಯದ ಅಂಗಡಿ ", icon: <FaWineBottle />, to: "/business/Wine Shop", color: "bg-red-500" },
+        { id: 4, name: "Rice Mill", kannada: " ಅಕ್ಕಿ ಗಿರಣಿ ", icon: <FaIndustry />, to: "/business/Rice Mill", color: "bg-yellow-600" },
+        { id: 5, name: "Interlock Factory", kannada: " ಇಂಟರ್ಲಾಕ್ ಕಾರ್ಖಾನೆ ", icon: <FaIndustry />, to: "/business/Interlock Factory", color: "bg-gray-700" },
+        { id: 6, name: "Grama Panchayat", kannada: " ಗ್ರಾಮ ಪಂಚಾಯತಿ ", icon: <FaComments />, to: "/business/Grama Panchayat", color: "bg-teal-500" },
+        { id: 7, name: "Electrician", kannada: " ಎಲೆಕ್ಟ್ರಿಷಿಯನ್ ", icon: <FaWrench />, to: "/business/Electrician", color: "bg-orange-500" },
+        { id: 8, name: "Doctors", kannada: " ವೈದ್ಯರು ", icon: <FaStethoscope />, to: "/business/Doctors", color: "bg-red-500" },
+        { id: 9, name: "Engineers", kannada: " ಎಂಜಿನಿಯರ್‌ಗಳು ", icon: <FaTools />, to: "/business/Engineers", color: "bg-purple-700" },
+        { id: 10, name: "Teachers", kannada: " ಶಿಕ್ಷಕರು ", icon: <FaChalkboardTeacher />, to: "/business/Teachers", color: "bg-indigo-500" },
+        { id: 11, name: "Temple", kannada: " ದೇವಸ್ಥಾನ ", icon: <FaLandmark />, to: "/business/Temple", color: "bg-orange-600" },
+        { id: 12, name: "Milk Dairy", kannada: " ಹಾಲಿನ ಡೈರಿ ", icon: <FaIndustry />, to: "/business/Milk Dairy", color: "bg-blue-800" },
+    ];
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim() !== "") {
+            navigate(`/search?q=${searchQuery}`);
+        }
+    };
 
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (searchQuery.trim() !== "") {
-            navigate(`/search?q=${searchQuery}`);
-        }
-    };
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            alert("Logged out successfully!");
+            navigate("/");
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    };
 
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-            alert("Logged out successfully!");
-            navigate("/");
-        } catch (error) {
-            console.error("Error logging out:", error);
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-gray-50 font-sans">
-            <header className="sticky top-0 z-40 bg-gradient-to-r from-blue-900 to-blue-700 text-white flex flex-col items-center p-6 shadow-2xl">
-                <div className="flex items-center space-x-6 w-full justify-between mb-4">
-                    <div className="flex items-center space-x-4">
+    return (
+        <div className="min-h-screen bg-gray-50 font-sans">
+            <header className="sticky top-0 z-40 bg-gradient-to-r from-blue-900 to-blue-700 text-white flex flex-col items-center p-6 shadow-2xl">
+                <div className="flex items-center space-x-6 w-full justify-between mb-4">
+                    {/* Buttons on the left side */}
+                    <div className="flex flex-col space-y-4">
                         <Link to="/add-villager-details" className="bg-gradient-to-r from-yellow-400 to-yellow-300 text-blue-900 px-6 py-2 rounded-full shadow-lg font-bold hover:scale-105 transition-transform duration-300">
                             Add Details
                         </Link>
+                        <Link to="/feedback" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300 flex items-center space-x-2">
+                            <span>Complaint</span>
+                        </Link>
                     </div>
-                    <form onSubmit={handleSearch} className="relative z-50 flex items-center">
-                        <input
-                            type="text"
-                            placeholder="Search by name..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="p-3 rounded-full w-48 border-2 border-transparent focus:border-blue-300 text-black focus:outline-none transition-all duration-300 shadow-inner"
-                        />
-                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors duration-300 ml-2">
-                            Search
-                        </button>
-                    </form>
-                    <div className="flex items-center space-x-2">
-                        {user ? (
-                            <>
-                                <Link to="/admin-feedback" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300 flex items-center space-x-2">
-                                    <FaComments />
-                                    <span>Feedback or Complain</span>
-                                </Link>
-                                <button onClick={handleLogout} className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
-                                    Logout
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <Link to="/feedback" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300 flex items-center space-x-2">
-                                    <FaComments />
-                                    <span>Feedback or Complain</span>
-                                </Link>
-                                <img
-                                    src={myPhoto}
-                                    alt="Admin Profile"
-                                    className="w-8 h-8 rounded-full"
-                                />
-                                <Link to="/admin-login" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
-                                    Admin Login
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                </div>
-                <div className="flex flex-col items-center mt-4">
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center text-yellow-300 tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
-                        Welcome to Manchikoppa Village
-                    </h1>
-                    <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold mt-2 text-center text-white tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
-                        ಮಂಚಿಕೊಪ್ಪ ಗ್ರಾಮಕ್ಕೆ ಸುಸ್ವಾಗತ
-                    </p>
-                    <p className="text-lg sm:text-xl text-white mt-2 text-center">
-                        Manchikoppa (post&village), Shikaripura (Taluk), Shimoga (District), Karnataka, 577428
-                    </p>
-                    <p className="text-lg sm:text-xl text-white text-center">
-                        ಮಂಚಿಕೊಪ್ಪ (ಪೋಸ್ಟ್ ಮತ್ತು ಗ್ರಾಮ), ಶಿಕಾರಿಪುರ (ತಾಲ್ಲೂಕು), ಶಿವಮೊಗ್ಗ (ಜಿಲ್ಲೆ), ಕರ್ನಾಟಕ, 577428
-                    </p>
-                </div>
-            </header>
-            <div className="mt-8 flex justify-center px-4">
-                <img src="/village.png" alt="Village Banner" className="w-1/2 max-w-lg rounded-full shadow-2xl object-cover border-4 border-blue-500" />
-            </div>
+                    <form onSubmit={handleSearch} className="relative z-50 flex items-center">
+                        <input
+                            type="text"
+                            placeholder="Search by name..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="p-3 rounded-full w-48 border-2 border-transparent focus:border-blue-300 text-black focus:outline-none transition-all duration-300 shadow-inner"
+                        />
+                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors duration-300 ml-2">
+                            Search
+                        </button>
+                    </form>
+                    {/* Photo and Admin Login button on the right, stacked vertically */}
+                    <div className="flex flex-col items-end space-y-2">
+                        {user ? (
+                            <>
+                                <button onClick={handleLogout} className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
+                                    Logout
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <img
+                                    src={myPhoto}
+                                    alt="Admin Profile"
+                                    className="w-8 h-8 rounded-full"
+                                />
+                                <Link to="/admin-login" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
+                                    Admin Login
+                                </Link>
+                            </>
+                        )}
+                    </div>
+                </div>
+                <div className="flex flex-col items-center mt-4">
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-center text-yellow-300 tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
+                        Welcome to Manchikoppa Village
+                    </h1>
+                    <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold mt-2 text-center text-white tracking-wide transform -skew-x-6 hover:skew-x-0 transition-transform duration-300">
+                        ಮಂಚಿಕೊಪ್ಪ ಗ್ರಾಮಕ್ಕೆ ಸುಸ್ವಾಗತ
+                    </p>
+                    <p className="text-lg sm:text-xl text-white mt-2 text-center">
+                        Manchikoppa (post&village), Shikaripura (Taluk), Shimoga (District), Karnataka, 577428
+                    </p>
+                    <p className="text-lg sm:text-xl text-white text-center">
+                        ಮಂಚಿಕೊಪ್ಪ (ಪೋಸ್ಟ್ ಮತ್ತು ಗ್ರಾಮ), ಶಿಕಾರಿಪುರ (ತಾಲ್ಲೂಕು), ಶಿವಮೊಗ್ಗ (ಜಿಲ್ಲೆ), ಕರ್ನಾಟಕ, 577428
+                    </p>
+                </div>
+            </header>
+            <div className="mt-8 flex justify-center px-4">
+                <img src="/village.png" alt="Village Banner" className="w-1/2 max-w-lg rounded-full shadow-2xl object-cover border-4 border-blue-500" />
+            </div>
 
-            <div className="flex justify-center flex-col items-center mt-8 p-4 bg-gray-200 rounded-lg max-w-lg mx-auto shadow-inner">
-                <h2 className="text-3xl font-bold text-blue-800 mb-4">Village Announcements</h2>
-                <Link to="/announcements" className="text-lg text-blue-500 hover:underline">
-                    Click here to see all announcements.
-                </Link>
-                {user && (
-                    <Link to="/add-announcement" className="mt-4 flex items-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300 shadow-md">
-                        <FaBullhorn />
-                        <span>Add New Announcement</span>
-                    </Link>
-                )}
-            </div>
+            <div className="flex justify-center flex-col items-center mt-8 p-4 bg-gray-200 rounded-lg max-w-lg mx-auto shadow-inner">
+                <h2 className="text-3xl font-bold text-blue-800 mb-4">Village Announcements</h2>
+                <Link to="/announcements" className="text-lg text-blue-500 hover:underline">
+                    Click here to see all announcements.
+                </Link>
+                {user && (
+                    <Link to="/add-announcement" className="mt-4 flex items-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300 shadow-md">
+                        <FaBullhorn />
+                        <span>Add New Announcement</span>
+                    </Link>
+                )}
+            </div>
 
-            <div className="flex justify-center space-x-4 mt-8">
-                <Link to="/announcements" className="flex items-center justify-center p-6 bg-blue-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <div className="flex flex-col items-center space-y-2">
-                        <FaBullhorn className="text-4xl text-blue-600" />
-                        <span className="text-lg font-semibold text-blue-800">Announcements</span>
-                    </div>
-                </Link>
-                <Link to="/feedback" className="flex items-center justify-center p-6 bg-green-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <div className="flex flex-col items-center space-y-2">
-                        <FaComments className="text-4xl text-green-600" />
-                        <span className="text-lg font-semibold text-green-800">Feedback</span>
-                    </div>
-                </Link>
-            </div>
+            <div className="flex justify-center space-x-4 mt-8">
+                <Link to="/announcements" className="flex items-center justify-center p-6 bg-blue-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col items-center space-y-2">
+                        <FaBullhorn className="text-4xl text-blue-600" />
+                        <span className="text-lg font-semibold text-blue-800">Announcements</span>
+                    </div>
+                </Link>
+                <Link to="/feedback" className="flex items-center justify-center p-6 bg-green-100 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <div className="flex flex-col items-center space-y-2">
+                        <FaComments className="text-4xl text-green-600" />
+                        <span className="text-lg font-semibold text-green-800">Feedback</span>
+                    </div>
+                </Link>
+            </div>
 
-            <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 gap-8 px-4 max-w-6xl mx-auto">
-                {services.map((service) => (
-                    <Link
-                        key={service.id}
-                        to={`/business/${service.name}`}
-                        className="group bg-white rounded-3xl p-8 text-center shadow-lg hover:shadow-2xl hover:scale-105 transform transition duration-300"
-                    >
-                        <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${service.color} text-3xl text-white group-hover:bg-opacity-80 transition duration-300`}>
-                            {service.icon}
-                        </div>
-                        <h2 className="text-2xl font-bold text-blue-800 mt-4 group-hover:text-blue-600 transition duration-300">{service.name} <br /><span className="text-lg text-green-700 font-normal">{service.kannada}</span></h2>
-                        <p className="text-sm text-gray-500 mt-2">Click to view details</p>
-                    </Link>
-                ))}
-            </div>
-            <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
-                <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details</h3>
-                <p className="text-gray-500 text-center text-lg mt-8">Click on the Search button above to search villager details.</p>
-            </div>
-        </div>
-    );
+            <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 gap-8 px-4 max-w-6xl mx-auto">
+                {services.map((service) => (
+                    <Link
+                        key={service.id}
+                        to={`/business/${service.name}`}
+                        className="group bg-white rounded-3xl p-8 text-center shadow-lg hover:shadow-2xl hover:scale-105 transform transition duration-300"
+                    >
+                        <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center ${service.color} text-3xl text-white group-hover:bg-opacity-80 transition duration-300`}>
+                            {service.icon}
+                        </div>
+                        <h2 className="text-2xl font-bold text-blue-800 mt-4 group-hover:text-blue-600 transition duration-300">{service.name} <br /><span className="text-lg text-green-700 font-normal">{service.kannada}</span></h2>
+                        <p className="text-sm text-gray-500 mt-2">Click to view details</p>
+                    </Link>
+                ))}
+            </div>
+            <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
+                <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details</h3>
+                <p className="text-gray-500 text-center text-lg mt-8">Click on the Search button above to search villager details.</p>
+            </div>
+        </div>
+    );
 }
-
 function App() {
     const [user, setUser] = useState(null);
 
