@@ -83,6 +83,7 @@ function VillagerForm() {
         name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: ""
     });
     const [photoFile, setPhotoFile] = useState(null);
+    const [photoPreview, setPhotoPreview] = useState(null);
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
@@ -91,69 +92,39 @@ function VillagerForm() {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handlePhotoChange = async (e) => {
+    const handlePhotoChange = (e) => {
         const file = e.target.files[0];
         if (!file) {
-            setError("");
             setPhotoFile(null);
+            setPhotoPreview(null);
+            setError("");
             return;
         }
 
         setError("");
-        
-        // Check file type
+
         if (!file.type.startsWith('image/')) {
             setError("Please upload a valid image file.");
             setPhotoFile(null);
+            setPhotoPreview(null);
             return;
         }
 
-        const maxFileSize = 50 * 1024; // 50 KB in bytes
-        const options = {
-            maxSizeMB: 0.05, // Target maximum size in MB
-            maxWidthOrHeight: 800,
-            useWebWorker: true,
-        };
-
-        let processedFile = file;
-
-        try {
-            // Attempt to compress the image
-            processedFile = await imageCompression(file, options);
-            console.log(`Compressed file size: ${processedFile.size / 1024} KB`);
-        } catch (error) {
-            console.error('Compression failed, falling back to original file:', error);
-            // Compression failed, use the original file and check its size
-            if (file.size > maxFileSize) {
-                setError(`Failed to compress image. Please upload a photo smaller than ${maxFileSize / 1024} KB.`);
-                setPhotoFile(null);
-                return;
-            }
-            // If original file is small enough, use it
-            processedFile = file;
+        // Set file size to 3 KB
+        const maxFileSize = 3 * 1024; // 3 KB in bytes
+        if (file.size > maxFileSize) {
+            setError("Photo size must be less than 3 KB.");
+            setPhotoFile(null);
+            setPhotoPreview(null);
+            return;
         }
 
-        const img = new Image();
-        img.src = URL.createObjectURL(processedFile);
-
-        img.onload = () => {
-            const width = img.width;
-            const height = img.height;
-            const aspectRatio = height / width;
-
-            if (aspectRatio < 1.2 || aspectRatio > 1.3) {
-                setError("Photo must be a portrait orientation (e.g., 3x4 or 4x5 ratio).");
-                setPhotoFile(null);
-            } else {
-                setPhotoFile(processedFile);
-            }
-            URL.revokeObjectURL(img.src);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPhotoPreview(reader.result);
         };
-
-        img.onerror = () => {
-            setError("Could not read the image file. Please try a different one.");
-            setPhotoFile(null);
-        };
+        reader.readAsDataURL(file);
+        setPhotoFile(file);
     };
 
     const handleSubmit = async (e) => {
@@ -178,6 +149,7 @@ function VillagerForm() {
             alert("Details saved successfully!");
             setFormData({ name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: "" });
             setPhotoFile(null);
+            setPhotoPreview(null);
             navigate("/");
         } catch (error) {
             console.error("Error adding document:", error);
@@ -221,6 +193,12 @@ function VillagerForm() {
                     <div>
                         <label className="block text-gray-700">Profile Photo</label>
                         <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
+                        {photoPreview && (
+                            <div className="mt-4 flex flex-col items-center">
+                                <span className="text-gray-700 mb-2">Image Preview:</span>
+                                <img src={photoPreview} alt="Profile Preview" className="w-24 h-24 object-cover rounded-full border border-gray-300" />
+                            </div>
+                        )}
                         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                     </div>
                     <button
@@ -409,6 +387,7 @@ function BusinessForm() {
         members: [{ name: "", work: "", phone: "" }],
     });
     const [photoFile, setPhotoFile] = useState(null);
+    const [photoPreview, setPhotoPreview] = useState(null);
     const [error, setError] = useState("");
 
     const handleChange = (e) => {
@@ -416,69 +395,39 @@ function BusinessForm() {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handlePhotoChange = async (e) => {
+    const handlePhotoChange = (e) => {
         const file = e.target.files[0];
         if (!file) {
-            setError("");
             setPhotoFile(null);
+            setPhotoPreview(null);
+            setError("");
             return;
         }
 
         setError("");
         
-        // Check file type
         if (!file.type.startsWith('image/')) {
             setError("Please upload a valid image file.");
             setPhotoFile(null);
+            setPhotoPreview(null);
             return;
         }
 
-        const maxFileSize = 50 * 1024; // 50 KB in bytes
-        const options = {
-            maxSizeMB: 0.05, // Target maximum size in MB
-            maxWidthOrHeight: 800,
-            useWebWorker: true,
-        };
-
-        let processedFile = file;
-
-        try {
-            // Attempt to compress the image
-            processedFile = await imageCompression(file, options);
-            console.log(`Compressed file size: ${processedFile.size / 1024} KB`);
-        } catch (error) {
-            console.error('Compression failed, falling back to original file:', error);
-            // Compression failed, use the original file and check its size
-            if (file.size > maxFileSize) {
-                setError(`Failed to compress image. Please upload a photo smaller than ${maxFileSize / 1024} KB.`);
-                setPhotoFile(null);
-                return;
-            }
-            // If original file is small enough, use it
-            processedFile = file;
+        // Set file size to 3 KB
+        const maxFileSize = 3 * 1024; // 3 KB in bytes
+        if (file.size > maxFileSize) {
+            setError("Photo size must be less than 3 KB.");
+            setPhotoFile(null);
+            setPhotoPreview(null);
+            return;
         }
 
-        const img = new Image();
-        img.src = URL.createObjectURL(processedFile);
-
-        img.onload = () => {
-            const width = img.width;
-            const height = img.height;
-            const aspectRatio = width / height;
-
-            if (aspectRatio < 0.75 || aspectRatio > 1.5) {
-                setError("Please upload a photo with a more square or landscape orientation.");
-                setPhotoFile(null);
-            } else {
-                setPhotoFile(processedFile);
-            }
-            URL.revokeObjectURL(img.src);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPhotoPreview(reader.result);
         };
-
-        img.onerror = () => {
-            setError("Could not read the image file. Please try a different one.");
-            setPhotoFile(null);
-        };
+        reader.readAsDataURL(file);
+        setPhotoFile(file);
     };
 
     const handleMemberChange = (index, e) => {
@@ -610,6 +559,12 @@ function BusinessForm() {
                     <div>
                         <label className="block text-gray-700">Business/Service Photo</label>
                         <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
+                        {photoPreview && (
+                            <div className="mt-4 flex flex-col items-center">
+                                <span className="text-gray-700 mb-2">Image Preview:</span>
+                                <img src={photoPreview} alt="Business Preview" className="w-48 h-32 object-cover rounded-md border border-gray-300" />
+                            </div>
+                        )}
                         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                     </div>
                     {hasMembers && (
