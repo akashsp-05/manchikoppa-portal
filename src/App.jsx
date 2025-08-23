@@ -83,6 +83,7 @@ function VillagerForm() {
         name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: ""
     });
     const [photoFile, setPhotoFile] = useState(null);
+    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -90,21 +91,83 @@ function VillagerForm() {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handlePhotoChange = (e) => {
-        if (e.target.files[0]) {
-            setPhotoFile(e.target.files[0]);
+    const handlePhotoChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            setError("");
+            setPhotoFile(null);
+            return;
         }
+
+        setError("");
+        
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+            setError("Please upload a valid image file.");
+            setPhotoFile(null);
+            return;
+        }
+
+        const maxFileSize = 50 * 1024; // 50 KB in bytes
+        const options = {
+            maxSizeMB: 0.05, // Target maximum size in MB
+            maxWidthOrHeight: 800,
+            useWebWorker: true,
+        };
+
+        let processedFile = file;
+
+        try {
+            // Attempt to compress the image
+            processedFile = await imageCompression(file, options);
+            console.log(`Compressed file size: ${processedFile.size / 1024} KB`);
+        } catch (error) {
+            console.error('Compression failed, falling back to original file:', error);
+            // Compression failed, use the original file and check its size
+            if (file.size > maxFileSize) {
+                setError(`Failed to compress image. Please upload a photo smaller than ${maxFileSize / 1024} KB.`);
+                setPhotoFile(null);
+                return;
+            }
+            // If original file is small enough, use it
+            processedFile = file;
+        }
+
+        const img = new Image();
+        img.src = URL.createObjectURL(processedFile);
+
+        img.onload = () => {
+            const width = img.width;
+            const height = img.height;
+            const aspectRatio = height / width;
+
+            if (aspectRatio < 1.2 || aspectRatio > 1.3) {
+                setError("Photo must be a portrait orientation (e.g., 3x4 or 4x5 ratio).");
+                setPhotoFile(null);
+            } else {
+                setPhotoFile(processedFile);
+            }
+            URL.revokeObjectURL(img.src);
+        };
+
+        img.onerror = () => {
+            setError("Could not read the image file. Please try a different one.");
+            setPhotoFile(null);
+        };
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (error || !photoFile) {
+            alert(error || "Please select a photo to upload.");
+            return;
+        }
+
         try {
-            let photoURL = "";
-            if (photoFile) {
-                const photoRef = ref(storage, `villager_photos/${uuidv4()}-${photoFile.name}`);
-                await uploadBytes(photoRef, photoFile);
-                photoURL = await getDownloadURL(photoRef);
-            }
+            const photoRef = ref(storage, `villager_photos/${uuidv4()}-${photoFile.name}`);
+            await uploadBytes(photoRef, photoFile);
+            const photoURL = await getDownloadURL(photoRef);
 
             const villagerData = {
                 ...formData,
@@ -158,6 +221,7 @@ function VillagerForm() {
                     <div>
                         <label className="block text-gray-700">Profile Photo</label>
                         <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
+                        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                     </div>
                     <button
                         type="submit"
@@ -167,6 +231,82 @@ function VillagerForm() {
                     </button>
                 </form>
             </div>
+        </div>
+    );
+}
+function VillagersPage() {
+    const [villagers, setVillagers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchVillagers = async () => {
+            setIsLoading(true);
+            try {
+                const villagersCol = collection(db, "villagers");
+                const villagerSnapshot = await getDocs(villagersCol);
+                const villagerList = villagerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setVillagers(villagerList);
+            } catch (error) {
+                console.error("Error fetching villagers:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchVillagers();
+    }, []);
+
+    const filteredVillagers = villagers.filter(villager => {
+        const lowerCaseSearch = searchTerm.toLowerCase();
+        return (
+            (villager.name && villager.name.toLowerCase().includes(lowerCaseSearch)) ||
+            (villager.work && villager.work.toLowerCase().includes(lowerCaseSearch)) ||
+            (villager.phone && villager.phone.includes(lowerCaseSearch))
+        );
+    });
+
+    return (
+        <div className="p-8 bg-gray-50 min-h-screen">
+            <h2 className="text-3xl font-bold text-center mb-6 text-blue-800">Search Villager Details</h2>
+            <div className="max-w-xl mx-auto mb-6">
+                <input
+                    type="text"
+                    placeholder="Search by name, work, or phone..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full p-4 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
+            {isLoading ? (
+                <p className="text-center text-gray-500 text-lg">Loading...</p>
+            ) : filteredVillagers.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredVillagers.map((villager) => (
+                        <div key={villager.id} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center space-x-4">
+                            {villager.photoURL && (
+                                <img
+                                    src={villager.photoURL}
+                                    alt={villager.name}
+                                    className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                                />
+                            )}
+                            <div>
+                                <h3 className="font-bold text-xl text-blue-700 mb-2">{villager.name}</h3>
+                                <div className="text-gray-600 space-y-1 text-sm">
+                                    <p><span className="font-semibold">Phone:</span> {villager.phone}</p>
+                                    <p><span className="font-semibold">Work:</span> {villager.work}</p>
+                                    <p><span className="font-semibold">Address:</span> {villager.address}</p>
+                                    <p><span className="font-semibold">Age:</span> {villager.age}</p>
+                                    <p><span className="font-semibold">DOB:</span> {villager.dob}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <p className="text-center text-gray-500 text-lg">No villagers found matching your search.</p>
+            )}
         </div>
     );
 }
@@ -261,7 +401,6 @@ function BusinessPage({ user }) {
         </div>
     );
 }
-
 function BusinessForm() {
     const { businessType } = useParams();
     const navigate = useNavigate();
@@ -270,16 +409,76 @@ function BusinessForm() {
         members: [{ name: "", work: "", phone: "" }],
     });
     const [photoFile, setPhotoFile] = useState(null);
+    const [error, setError] = useState("");
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handlePhotoChange = (e) => {
-        if (e.target.files[0]) {
-            setPhotoFile(e.target.files[0]);
+    const handlePhotoChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            setError("");
+            setPhotoFile(null);
+            return;
         }
+
+        setError("");
+        
+        // Check file type
+        if (!file.type.startsWith('image/')) {
+            setError("Please upload a valid image file.");
+            setPhotoFile(null);
+            return;
+        }
+
+        const maxFileSize = 50 * 1024; // 50 KB in bytes
+        const options = {
+            maxSizeMB: 0.05, // Target maximum size in MB
+            maxWidthOrHeight: 800,
+            useWebWorker: true,
+        };
+
+        let processedFile = file;
+
+        try {
+            // Attempt to compress the image
+            processedFile = await imageCompression(file, options);
+            console.log(`Compressed file size: ${processedFile.size / 1024} KB`);
+        } catch (error) {
+            console.error('Compression failed, falling back to original file:', error);
+            // Compression failed, use the original file and check its size
+            if (file.size > maxFileSize) {
+                setError(`Failed to compress image. Please upload a photo smaller than ${maxFileSize / 1024} KB.`);
+                setPhotoFile(null);
+                return;
+            }
+            // If original file is small enough, use it
+            processedFile = file;
+        }
+
+        const img = new Image();
+        img.src = URL.createObjectURL(processedFile);
+
+        img.onload = () => {
+            const width = img.width;
+            const height = img.height;
+            const aspectRatio = width / height;
+
+            if (aspectRatio < 0.75 || aspectRatio > 1.5) {
+                setError("Please upload a photo with a more square or landscape orientation.");
+                setPhotoFile(null);
+            } else {
+                setPhotoFile(processedFile);
+            }
+            URL.revokeObjectURL(img.src);
+        };
+
+        img.onerror = () => {
+            setError("Could not read the image file. Please try a different one.");
+            setPhotoFile(null);
+        };
     };
 
     const handleMemberChange = (index, e) => {
@@ -301,13 +500,17 @@ function BusinessForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (error || !photoFile) {
+            alert(error || "Please select a photo to upload.");
+            return;
+        }
+        
         try {
             let photoURL = "";
-            if (photoFile) {
-                const photoRef = ref(storage, `business_photos/${uuidv4()}-${photoFile.name}`);
-                await uploadBytes(photoRef, photoFile);
-                photoURL = await getDownloadURL(photoRef);
-            }
+            const photoRef = ref(storage, `business_photos/${uuidv4()}-${photoFile.name}`);
+            await uploadBytes(photoRef, photoFile);
+            photoURL = await getDownloadURL(photoRef);
 
             let dataToSave;
             const commonData = {
@@ -319,9 +522,7 @@ function BusinessForm() {
                 photoURL: photoURL,
             };
 
-            const hasMembers = ["Shops", "Schools", "Wine Shop", "Rice Mill", "Interlock Factory", "Milk Dairy"].includes(businessType);
-            const hasOwner = ["Shops", "Schools", "Wine Shop", "Rice Mill", "Interlock Factory", "Milk Dairy"].includes(businessType);
-            const hasSpecification = ["Electrician", "Doctors", "Engineers", "Teachers"].includes(businessType);
+            const isIndividual = ["Electrician", "Doctors", "Engineers", "Teachers"].includes(businessType);
             const isTemple = businessType === "Temple";
             const isGramaPanchayat = businessType === "Grama Panchayat";
 
@@ -333,7 +534,7 @@ function BusinessForm() {
                     locationLink: formData.locationLink,
                     photoURL: photoURL,
                 };
-            } else if (hasSpecification) {
+            } else if (isIndividual) {
                 dataToSave = {
                     ...commonData,
                     specification: formData.specification,
@@ -409,6 +610,7 @@ function BusinessForm() {
                     <div>
                         <label className="block text-gray-700">Business/Service Photo</label>
                         <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
+                        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                     </div>
                     {hasMembers && (
                         <div>
@@ -856,65 +1058,6 @@ function HomePage({ user }) {
                 </div>
             </div>
 
-            {/* Manchikoppa Weather Section Starts */}
-            <div className="flex justify-center mt-12 px-4">
-                <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                        <FaCloud className="text-blue-500 mr-2" /> Manchikoppa Live Weather
-                    </h3>
-                    <div className="text-gray-600 space-y-3">
-                        <div className="flex items-center space-x-2">
-                            <FaTemperatureHigh className="text-red-500" />
-                            <p className="text-lg">Temperature: 23.6 °C</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <FaCloud className="text-gray-500" />
-                            <p className="text-lg">overcast clouds</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <FaWind className="text-blue-500" />
-                            <p className="text-lg">Wind: 5.14 mt/sec towards W</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <FaUmbrella className="text-indigo-500" />
-                            <p className="text-lg">Humidity: 78%</p>
-                        </div>
-                        <p className="text-sm text-gray-400">StationName: "HirekerÅ«r"</p>
-                        <p className="text-sm text-gray-400">observed on 1 Mins Back</p>
-                    </div>
-                    <h4 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                        <FaCalendarAlt className="text-green-500 mr-2" /> Manchikoppa Weather Forecast for Next 5 days
-                    </h4>
-                    <div className="space-y-4">
-                        <div className="p-4 bg-gray-100 rounded-lg">
-                            <p className="font-semibold">24-08-2025</p>
-                            <p>19.8°C to 26.1°C</p>
-                            <p className="text-gray-600">overcast clouds, light rain</p>
-                        </div>
-                        <div className="p-4 bg-gray-100 rounded-lg">
-                            <p className="font-semibold">25-08-2025</p>
-                            <p>19.1°C to 25.8°C</p>
-                            <p className="text-gray-600">overcast clouds</p>
-                        </div>
-                        <div className="p-4 bg-gray-100 rounded-lg">
-                            <p className="font-semibold">26-08-2025</p>
-                            <p>19.0°C to 26.3°C</p>
-                            <p className="text-gray-600">overcast clouds, light rain, broken clouds</p>
-                        </div>
-                        <div className="p-4 bg-gray-100 rounded-lg">
-                            <p className="font-semibold">27-08-2025</p>
-                            <p>19.5°C to 25.4°C</p>
-                            <p className="text-gray-600">overcast clouds, light rain</p>
-                        </div>
-                        <div className="p-4 bg-gray-100 rounded-lg">
-                            <p className="font-semibold">28-08-2025</p>
-                            <p>20.8°C to 22.4°C</p>
-                            <p className="text-gray-600">light rain</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {/* Manchikoppa Weather Section Ends */}
             <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
                 <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details</h3>
                 <p className="text-gray-500 text-center text-lg mt-8">Click on the Search button above to search villager details.</p>
@@ -922,6 +1065,7 @@ function HomePage({ user }) {
         </div>
     );
 }
+
 function App() {
     const [user, setUser] = useState(null);
 
