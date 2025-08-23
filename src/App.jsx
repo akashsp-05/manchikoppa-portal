@@ -760,7 +760,7 @@ function HomePage({ user }) {
                                 <img
                                     src={myPhoto}
                                     alt="Admin Profile"
-                                    className="w-6 h-6 rounded-full"
+                                    className="w-4 h-4 rounded-full"
                                 />
                                 <Link to="/admin-login" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
                                     Admin Login
@@ -802,7 +802,7 @@ function HomePage({ user }) {
                 )}
             </div>
 
-            {/* Services Section - Now placed before the Manchikoppa details section */}
+            {/* Services Section */}
             <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 gap-8 px-4 max-w-6xl mx-auto">
                 {services.map((service) => (
                     <Link
@@ -819,7 +819,7 @@ function HomePage({ user }) {
                 ))}
             </div>
 
-            {/* Manchikoppa Details Section - Now placed after the Services section */}
+            {/* Manchikoppa Details Section */}
             <div className="flex justify-center mt-8 px-4">
                 <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
                     <h3 className="text-2xl font-bold text-gray-800 mb-4">Manchikoppa</h3>
@@ -856,7 +856,7 @@ function HomePage({ user }) {
                 </div>
             </div>
 
-            {/* */}
+            {/* Manchikoppa Weather Section Starts */}
             <div className="flex justify-center mt-12 px-4">
                 <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
                     <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
@@ -882,7 +882,6 @@ function HomePage({ user }) {
                         <p className="text-sm text-gray-400">StationName: "HirekerÅ«r"</p>
                         <p className="text-sm text-gray-400">observed on 1 Mins Back</p>
                     </div>
-                    <hr className="my-6 border-gray-300" />
                     <h4 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
                         <FaCalendarAlt className="text-green-500 mr-2" /> Manchikoppa Weather Forecast for Next 5 days
                     </h4>
@@ -915,7 +914,7 @@ function HomePage({ user }) {
                     </div>
                 </div>
             </div>
-            {/* */}
+            {/* Manchikoppa Weather Section Ends */}
             <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
                 <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details</h3>
                 <p className="text-gray-500 text-center text-lg mt-8">Click on the Search button above to search villager details.</p>
