@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import myPhoto from './myphoto.jpg';
 import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
-import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock } from "react-icons/fa";
+import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella } from "react-icons/fa";
 
 // All components are combined into this single file for simplicity.
 
@@ -706,6 +706,7 @@ function HomePage({ user }) {
     const navigate = useNavigate();
     const [currentTime, setCurrentTime] = useState("");
     const [currentDate, setCurrentDate] = useState("");
+
     useEffect(() => {
         const updateDateTime = () => {
             const now = new Date();
@@ -718,20 +719,7 @@ function HomePage({ user }) {
         const timer = setInterval(updateDateTime, 1000);
         return () => clearInterval(timer);
     }, []);
-    const services = [
-        { id: 1, name: "Shops", kannada: "ಅಂಗಡಿಗಳು", icon: <FaStore />, to: "/business/Shops", color: "bg-blue-500" },
-        { id: 2, name: "Schools", kannada: "ಶಾಲಾ-ಕಾಲೇಜು", icon: <FaSchool />, to: "/business/Schools", color: "bg-green-500" },
-        { id: 3, name: "Wine Shop", kannada: " ಮದ್ಯದ ಅಂಗಡಿ ", icon: <FaWineBottle />, to: "/business/Wine Shop", color: "bg-red-500" },
-        { id: 4, name: "Rice Mill", kannada: " ಅಕ್ಕಿ ಗಿರಣಿ ", icon: <FaIndustry />, to: "/business/Rice Mill", color: "bg-yellow-600" },
-        { id: 5, name: "Interlock Factory", kannada: " ಇಂಟರ್ಲಾಕ್ ಕಾರ್ಖಾನೆ ", icon: <FaIndustry />, to: "/business/Interlock Factory", color: "bg-gray-700" },
-        { id: 6, name: "Grama Panchayat", kannada: " ಗ್ರಾಮ ಪಂಚಾಯತಿ ", icon: <FaComments />, to: "/business/Grama Panchayat", color: "bg-teal-500" },
-        { id: 7, name: "Electrician", kannada: " ಎಲೆಕ್ಟ್ರಿಷಿಯನ್ ", icon: <FaWrench />, to: "/business/Electrician", color: "bg-orange-500" },
-        { id: 8, name: "Doctors", kannada: " ವೈದ್ಯರು ", icon: <FaStethoscope />, to: "/business/Doctors", color: "bg-red-500" },
-        { id: 9, name: "Engineers", kannada: " ಎಂಜಿನಿಯರ್‌ಗಳು ", icon: <FaTools />, to: "/business/Engineers", color: "bg-purple-700" },
-        { id: 10, name: "Teachers", kannada: " ಶಿಕ್ಷಕರು ", icon: <FaChalkboardTeacher />, to: "/business/Teachers", color: "bg-indigo-500" },
-        { id: 11, name: "Temple", kannada: " ದೇವಸ್ಥಾನ ", icon: <FaLandmark />, to: "/business/Temple", color: "bg-orange-600" },
-        { id: 12, name: "Milk Dairy", kannada: " ಹಾಲಿನ ಡೈರಿ ", icon: <FaIndustry />, to: "/business/Milk Dairy", color: "bg-blue-800" },
-    ];
+
     const handleLogout = async () => {
         try {
             await signOut(auth);
@@ -741,11 +729,11 @@ function HomePage({ user }) {
             console.error("Error logging out:", error);
         }
     };
+
     return (
         <div className="min-h-screen bg-gray-50 font-sans">
             <header className="sticky top-0 z-40 bg-gradient-to-r from-blue-900 to-blue-700 text-white flex flex-col items-center p-6 shadow-2xl">
                 <div className="flex items-center space-x-6 w-full justify-between mb-4">
-                    {/* Buttons on the left side */}
                     <div className="flex flex-col space-y-8">
                         <Link to="/add-villager-details" className="bg-gradient-to-r from-yellow-400 to-yellow-300 text-blue-900 px-6 py-2 rounded-full shadow-lg font-bold hover:scale-105 transition-transform duration-300">
                             Add Details
@@ -754,14 +742,12 @@ function HomePage({ user }) {
                             <span>Complaint</span>
                         </Link>
                     </div>
-                    {/* Search button, now a standalone button */}
                     <button
                         onClick={() => navigate('/search')}
                         className="bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors duration-300"
                     >
                         Search
                     </button>
-                    {/* Photo and Admin Login button on the right, stacked vertically */}
                     <div className="flex flex-col items-end space-y-2">
                         {user ? (
                             <>
@@ -815,18 +801,17 @@ function HomePage({ user }) {
                     </div>
                 )}
             </div>
-            {/* New Comprehensive Village Details Box */}
             <div className="flex justify-center mt-8 px-4">
                 <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
                     <h3 className="text-2xl font-bold text-gray-800 mb-4">Manchikoppa</h3>
                     <div className="text-gray-600 space-y-2">
-                        <p className="font-semibold text-sm">{ "Karnataka >> Shimoga >> Shikarpur" }</p>
+                        <p className="font-semibold text-sm">{"Karnataka >> Shimoga >> Shikarpur"}</p>
                         <p className="text-sm">Locality Name: Manchikoppa (3)</p>
                         <p className="text-sm">Taluk Name: Shikarpur</p>
                         <p className="text-sm">District: Shimoga</p>
                         <p className="text-sm">State: Karnataka</p>
                         <p className="text-sm">Division: Bangalore</p>
-                        <p className="text-sm">Language: Kannada and Urdu</p>
+                        <p className="text-sm">Language: Kannada </p>
                         <div className="flex items-center space-x-2 text-sm mt-4">
                             <FaClock className="text-blue-500" />
                             <span>Current Time: {currentTime} (IST)</span>
@@ -842,7 +827,7 @@ function HomePage({ user }) {
                         <p className="text-sm">Assembly MLA: Vijayendra Yediyurappa</p>
                         <p className="text-sm">Lok Sabha constituency: Shimoga parliamentary. constituency</p>
                         <p className="text-sm">Parliament MP: B.Y.RAGHAVENDRA.</p>
-                        <p className="text-sm">Serpanch Name: Karibasappa</p>
+                        <p className="text-sm">Serpanch Name: -</p>
                         <div className="flex items-center space-x-4 mt-4">
                             <p className="text-sm">Pin Code: 577428</p>
                         </div>
@@ -866,6 +851,66 @@ function HomePage({ user }) {
                     </Link>
                 ))}
             </div>
+            {/* */}
+            <div className="flex justify-center mt-12 px-4">
+                <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                        <FaCloud className="text-blue-500 mr-2" /> Manchikoppa Live Weather
+                    </h3>
+                    <div className="text-gray-600 space-y-3">
+                        <div className="flex items-center space-x-2">
+                            <FaTemperatureHigh className="text-red-500" />
+                            <p className="text-lg">Temperature: 23.6 °C</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <FaCloud className="text-gray-500" />
+                            <p className="text-lg">overcast clouds</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <FaWind className="text-blue-500" />
+                            <p className="text-lg">Wind: 5.14 mt/sec towards W</p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <FaUmbrella className="text-indigo-500" />
+                            <p className="text-lg">Humidity: 78%</p>
+                        </div>
+                        <p className="text-sm text-gray-400">StationName: "HirekerÅ«r"</p>
+                        <p className="text-sm text-gray-400">observed on 1 Mins Back</p>
+                    </div>
+                    <hr className="my-6 border-gray-300" />
+                    <h4 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <FaCalendarAlt className="text-green-500 mr-2" /> Manchikoppa Weather Forecast for Next 5 days
+                    </h4>
+                    <div className="space-y-4">
+                        <div className="p-4 bg-gray-100 rounded-lg">
+                            <p className="font-semibold">24-08-2025</p>
+                            <p>19.8°C to 26.1°C</p>
+                            <p className="text-gray-600">overcast clouds, light rain</p>
+                        </div>
+                        <div className="p-4 bg-gray-100 rounded-lg">
+                            <p className="font-semibold">25-08-2025</p>
+                            <p>19.1°C to 25.8°C</p>
+                            <p className="text-gray-600">overcast clouds</p>
+                        </div>
+                        <div className="p-4 bg-gray-100 rounded-lg">
+                            <p className="font-semibold">26-08-2025</p>
+                            <p>19.0°C to 26.3°C</p>
+                            <p className="text-gray-600">overcast clouds, light rain, broken clouds</p>
+                        </div>
+                        <div className="p-4 bg-gray-100 rounded-lg">
+                            <p className="font-semibold">27-08-2025</p>
+                            <p>19.5°C to 25.4°C</p>
+                            <p className="text-gray-600">overcast clouds, light rain</p>
+                        </div>
+                        <div className="p-4 bg-gray-100 rounded-lg">
+                            <p className="font-semibold">28-08-2025</p>
+                            <p>20.8°C to 22.4°C</p>
+                            <p className="text-gray-600">light rain</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/* */}
             <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
                 <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details</h3>
                 <p className="text-gray-500 text-center text-lg mt-8">Click on the Search button above to search villager details.</p>
@@ -873,6 +918,7 @@ function HomePage({ user }) {
         </div>
     );
 }
+
 function App() {
     const [user, setUser] = useState(null);
 
