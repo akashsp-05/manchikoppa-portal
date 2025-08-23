@@ -801,41 +801,8 @@ function HomePage({ user }) {
                     </div>
                 )}
             </div>
-            <div className="flex justify-center mt-8 px-4">
-                <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Manchikoppa</h3>
-                    <div className="text-gray-600 space-y-2">
-                        <p className="font-semibold text-sm">{"Karnataka >> Shimoga >> Shikarpur"}</p>
-                        <p className="text-sm">Locality Name: Manchikoppa (3)</p>
-                        <p className="text-sm">Taluk Name: Shikarpur</p>
-                        <p className="text-sm">District: Shimoga</p>
-                        <p className="text-sm">State: Karnataka</p>
-                        <p className="text-sm">Division: Bangalore</p>
-                        <p className="text-sm">Language: Kannada </p>
-                        <div className="flex items-center space-x-2 text-sm mt-4">
-                            <FaClock className="text-blue-500" />
-                            <span>Current Time: {currentTime} (IST)</span>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm">
-                            <FaCalendarAlt className="text-green-500" />
-                            <span>Date: {currentDate}</span>
-                        </div>
-                        <p className="text-sm">Time zone: IST (UTC+5:30)</p>
-                        <p className="text-sm">Elevation / Altitude: 661 meters. Above Seal level</p>
-                        <p className="text-sm">Telephone Code / Std Code: 08187</p>
-                        <p className="text-sm">Assembly constituency: Shikaripura assembly. constituency</p>
-                        <p className="text-sm">Assembly MLA: Vijayendra Yediyurappa</p>
-                        <p className="text-sm">Lok Sabha constituency: Shimoga parliamentary. constituency</p>
-                        <p className="text-sm">Parliament MP: B.Y.RAGHAVENDRA.</p>
-                        <p className="text-sm">Serpanch Name: -</p>
-                        <div className="flex items-center space-x-4 mt-4">
-                            <p className="text-sm">Pin Code: 577428</p>
-                        </div>
-                        <p className="text-sm">Post Office Name: Shiralakoppa</p>
-                        <p className="text-sm mt-4">Commodities Prices: <a href="#" className="text-blue-500 hover:underline">Hirekerur Market / Mandi</a></p>
-                    </div>
-                </div>
-            </div>
+
+            {/* Services Section - Now placed before the Manchikoppa details section */}
             <div className="mt-12 grid grid-cols-2 sm:grid-cols-3 gap-8 px-4 max-w-6xl mx-auto">
                 {services.map((service) => (
                     <Link
@@ -851,6 +818,44 @@ function HomePage({ user }) {
                     </Link>
                 ))}
             </div>
+
+            {/* Manchikoppa Details Section - Now placed after the Services section */}
+            <div className="flex justify-center mt-8 px-4">
+                <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Manchikoppa</h3>
+                    <div className="text-gray-600 space-y-2">
+                        <p className="font-semibold text-sm">{"Karnataka >> Shimoga >> Shikarpur"}</p>
+                        <p className="text-sm">Locality Name: Manchikoppa (3)</p>
+                        <p className="text-sm">Taluk Name: Shikarpur</p>
+                        <p className="text-sm">District: Shimoga</p>
+                        <p className="text-sm">State: Karnataka</p>
+                        <p className="text-sm">Division: Bangalore</p>
+                        <p className="text-sm">Language: Kannada and Urdu</p>
+                        <div className="flex items-center space-x-2 text-sm mt-4">
+                            <FaClock className="text-blue-500" />
+                            <span>Current Time: {currentTime} (IST)</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm">
+                            <FaCalendarAlt className="text-green-500" />
+                            <span>Date: {currentDate}</span>
+                        </div>
+                        <p className="text-sm">Time zone: IST (UTC+5:30)</p>
+                        <p className="text-sm">Elevation / Altitude: 661 meters. Above Seal level</p>
+                        <p className="text-sm">Telephone Code / Std Code: 08187</p>
+                        <p className="text-sm">Assembly constituency: Shikaripura assembly. constituency</p>
+                        <p className="text-sm">Assembly MLA: Vijayendra Yediyurappa</p>
+                        <p className="text-sm">Lok Sabha constituency: Shimoga parliamentary. constituency</p>
+                        <p className="text-sm">Parliament MP: B.Y.RAGHAVENDRA.</p>
+                        <p className="text-sm">Serpanch Name: Karibasappa</p>
+                        <div className="flex items-center space-x-4 mt-4">
+                            <p className="text-sm">Pin Code: 577428</p>
+                        </div>
+                        <p className="text-sm">Post Office Name: Shiralakoppa</p>
+                        <p className="text-sm mt-4">Commodities Prices: <a href="#" className="text-blue-500 hover:underline">Hirekerur Market / Mandi</a></p>
+                    </div>
+                </div>
+            </div>
+
             {/* */}
             <div className="flex justify-center mt-12 px-4">
                 <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
@@ -918,7 +923,6 @@ function HomePage({ user }) {
         </div>
     );
 }
-
 function App() {
     const [user, setUser] = useState(null);
 
