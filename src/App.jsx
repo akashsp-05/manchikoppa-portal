@@ -110,10 +110,10 @@ function VillagerForm() {
             return;
         }
 
-        // Set file size to 3 KB
-        const maxFileSize = 3 * 1024; // 3 KB in bytes
+        // Set file size to 5 KB
+        const maxFileSize = 5 * 1024; // 5 KB in bytes
         if (file.size > maxFileSize) {
-            setError("Photo size must be less than 3 KB.");
+            setError("Photo size must be less than 5 KB.");
             setPhotoFile(null);
             setPhotoPreview(null);
             return;
@@ -212,6 +212,7 @@ function VillagerForm() {
         </div>
     );
 }
+
 function VillagersPage() {
     const [villagers, setVillagers] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
