@@ -85,6 +85,7 @@ function VillagerForm() {
     const [photoFile, setPhotoFile] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [error, setError] = useState("");
+    const [showRules, setShowRules] = useState(false); // State to toggle rules visibility
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -110,10 +111,9 @@ function VillagerForm() {
             return;
         }
 
-        // Set file size to 5 KB
-        const maxFileSize = 5 * 1024; // 5 KB in bytes
+        const maxFileSize = 4 * 1024; // 4 KB in bytes
         if (file.size > maxFileSize) {
-            setError("Photo size must be less than 5 KB.");
+            setError("Photo size must be less than 4 KB.");
             setPhotoFile(null);
             setPhotoPreview(null);
             return;
@@ -150,6 +150,7 @@ function VillagerForm() {
             setFormData({ name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: "" });
             setPhotoFile(null);
             setPhotoPreview(null);
+            setShowRules(false);
             navigate("/");
         } catch (error) {
             console.error("Error adding document:", error);
@@ -201,17 +202,71 @@ function VillagerForm() {
                         )}
                         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                     </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
-                    >
-                        Save Details
-                    </button>
+
+                    <div className="flex justify-between items-center pt-2">
+                        <button
+                            type="button"
+                            onClick={() => setShowRules(!showRules)}
+                            className="text-sm text-blue-500 underline hover:no-underline"
+                        >
+                            {showRules ? "Hide Photo Rules" : "Show Photo Rules"}
+                        </button>
+                        <button
+                            type="submit"
+                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+                        >
+                            Save Details
+                        </button>
+                    </div>
                 </form>
+
+                {showRules && (
+                    <div className="mt-6 border-t pt-6">
+                        <h3 className="text-xl font-bold text-center mb-4">Photo Uploading Rules</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <h4 className="font-semibold text-lg">📌 Photo Uploading Rules (English)</h4>
+                                <ol className="list-decimal list-inside space-y-2 text-gray-700">
+                                    <li>The maximum photo size allowed is 4 KB.</li>
+                                    <li>To reduce your photo size, you can use this website: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Simple Image Resizer</a>.</li>
+                                    <li>Steps to resize:
+                                        <ul className="list-disc list-inside ml-4 space-y-1">
+                                            <li>Upload your photo.</li>
+                                            <li>Select **Dimensions (px)** option.</li>
+                                            <li>Do not select **“Keep aspect ratio”**.</li>
+                                            <li>Set **Width = 175** and **Height = 175**.</li>
+                                            <li>Click on **Resize**.</li>
+                                            <li>Download and upload the resized picture.</li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                            </div>
+                            <hr className="my-4" />
+                            <div>
+                                <h4 className="font-semibold text-lg">📌 ಫೋಟೋ ಅಪ್ಲೋಡ್ ನಿಯಮಗಳು (Kannada)</h4>
+                                <ol className="list-decimal list-inside space-y-2 text-gray-700">
+                                    <li>ಗರಿಷ್ಠ ಫೋಟೋ ಗಾತ್ರ 4 KB ಇರಬೇಕು.</li>
+                                    <li>ಫೋಟೋ ಗಾತ್ರ ಕಡಿಮೆ ಮಾಡಲು ಈ ವೆಬ್‌ಸೈಟ್ ಬಳಸಿ: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Simple Image Resizer</a>.</li>
+                                    <li>ಫೋಟೋ ರಿಸೈಜ್ ಮಾಡುವ ವಿಧಾನ:
+                                        <ul className="list-disc list-inside ml-4 space-y-1">
+                                            <li>ನಿಮ್ಮ ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
+                                            <li>**Dimensions (px)** ಆಯ್ಕೆ ಮಾಡಿ.</li>
+                                            <li>**Keep aspect ratio** ಆಯ್ಕೆ ಮಾಡಬೇಡಿ.</li>
+                                            <li>**Width = 175** ಮತ್ತು **Height = 175** ನಮೂದಿಸಿ.</li>
+                                            <li>**Resize** ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.</li>
+                                            <li>ಬಂದ ಫೋಟೋವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
+                                        </ul>
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
 }
+
 
 function VillagersPage() {
     const [villagers, setVillagers] = useState([]);
@@ -414,10 +469,10 @@ function BusinessForm() {
             return;
         }
 
-        // Set file size to 3 KB
-        const maxFileSize = 3 * 1024; // 3 KB in bytes
+        // Set file size to 4 KB
+        const maxFileSize = 4 * 1024; // 4 KB in bytes
         if (file.size > maxFileSize) {
-            setError("Photo size must be less than 3 KB.");
+            setError("Photo size must be less than 4 KB.");
             setPhotoFile(null);
             setPhotoPreview(null);
             return;
@@ -894,23 +949,24 @@ function HomePage({ user }) {
                 <div className="flex items-center space-x-6 w-full justify-between mb-4">
                     <div className="flex flex-col space-y-8">
                         <Link to="/add-villager-details" className="bg-gradient-to-r from-yellow-400 to-yellow-300 text-blue-900 px-6 py-2 rounded-full shadow-lg font-bold hover:scale-105 transition-transform duration-300">
-                            Add Details
+                            Add Details <br/> <span className="text-sm font-normal">ವಿವರಗಳನ್ನು ಸೇರಿಸಿ</span>
                         </Link>
                         <Link to="/feedback" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300 flex items-center space-x-2">
                             <span>Complaint</span>
+                            <span>/ ದೂರು</span>
                         </Link>
                     </div>
                     <button
                         onClick={() => navigate('/search')}
                         className="bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors duration-300"
                     >
-                        Search
+                        Search <br/> <span className="text-sm font-normal">ಹುಡುಕಿ</span>
                     </button>
                     <div className="flex flex-col items-end space-y-2">
                         {user ? (
                             <>
                                 <button onClick={handleLogout} className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
-                                    Logout
+                                    Logout <br/> <span className="text-sm font-normal">ಲಾಗ್ ಔಟ್</span>
                                 </button>
                             </>
                         ) : (
@@ -921,7 +977,7 @@ function HomePage({ user }) {
                                     className="w-4 h-4 rounded-full"
                                 />
                                 <Link to="/admin-login" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300">
-                                    Admin Login
+                                    Admin Login <br/> <span className="text-sm font-normal">ನಿರ್ವಾಹಕ ಲಾಗಿನ್</span>
                                 </Link>
                             </>
                         )}
@@ -946,15 +1002,16 @@ function HomePage({ user }) {
                 <img src="/village.png" alt="Village Banner" className="w-1/2 max-w-lg rounded-full shadow-2xl object-cover border-4 border-blue-500" />
             </div>
             <div className="flex justify-center flex-col items-center mt-8 p-4 bg-gray-200 rounded-lg max-w-lg mx-auto shadow-inner">
-                <h2 className="text-3xl font-bold text-blue-800 mb-4">Village Announcements</h2>
+                <h2 className="text-3xl font-bold text-blue-800 mb-4">Village Announcements <br/> <span className="text-xl font-normal">ಗ್ರಾಮ ಪ್ರಕಟಣೆಗಳು</span></h2>
                 <Link to="/announcements" className="text-lg text-blue-500 hover:underline">
-                    Click here to see all announcements.
+                    Click here to see all announcements. <br/> <span className="text-base">ಎಲ್ಲಾ ಪ್ರಕಟಣೆಗಳನ್ನು ನೋಡಲು ಇಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ.</span>
                 </Link>
                 {user && (
                     <div className="mt-4 flex flex-col items-center">
                         <Link to="/add-announcement" className="flex items-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300 shadow-md">
                             <FaBullhorn />
                             <span>Add New Announcement</span>
+                            <span>/ ಹೊಸ ಪ್ರಕಟಣೆ ಸೇರಿಸಿ</span>
                         </Link>
                     </div>
                 )}
@@ -972,7 +1029,7 @@ function HomePage({ user }) {
                             {service.icon}
                         </div>
                         <h2 className="text-2xl font-bold text-blue-800 mt-4 group-hover:text-blue-600 transition duration-300">{service.name} <br /><span className="text-lg text-green-700 font-normal">{service.kannada}</span></h2>
-                        <p className="text-sm text-gray-500 mt-2">Click to view details</p>
+                        <p className="text-sm text-gray-500 mt-2">Click to view details <br/> <span className="text-xs">ವಿವರಗಳನ್ನು ನೋಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ</span></p>
                     </Link>
                 ))}
             </div>
@@ -980,43 +1037,43 @@ function HomePage({ user }) {
             {/* Manchikoppa Details Section */}
             <div className="flex justify-center mt-8 px-4">
                 <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-lg">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Manchikoppa</h3>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Manchikoppa - ಮಂಚಿಕೊಪ್ಪ</h3>
                     <div className="text-gray-600 space-y-2">
-                        <p className="font-semibold text-sm">{"Karnataka >> Shimoga >> Shikarpur"}</p>
-                        <p className="text-sm">Locality Name: Manchikoppa (3)</p>
-                        <p className="text-sm">Taluk Name: Shikarpur</p>
-                        <p className="text-sm">District: Shimoga</p>
-                        <p className="text-sm">State: Karnataka</p>
-                        <p className="text-sm">Division: Bangalore</p>
-                        <p className="text-sm">Language: Kannada</p>
+                        <p className="font-semibold text-sm">Karnataka {" >> "} Shimoga {" >> "} Shikarpur<br/> <span className="font-normal text-xs">ಕರ್ನಾಟಕ {" >> "} ಶಿವಮೊಗ್ಗ {" >> "} ಶಿಕಾರಿಪುರ</span></p>
+                        <p className="text-sm">Locality Name: Manchikoppa (3) <br/> <span className="text-xs">ಸ್ಥಳೀಯ ಹೆಸರು: ಮಂಚಿಕೊಪ್ಪ (3)</span></p>
+                        <p className="text-sm">Taluk Name: Shikarpur <br/> <span className="text-xs">ತಾಲ್ಲೂಕಿನ ಹೆಸರು: ಶಿಕಾರಿಪುರ</span></p>
+                        <p className="text-sm">District: Shimoga <br/> <span className="text-xs">ಜಿಲ್ಲೆ: ಶಿವಮೊಗ್ಗ</span></p>
+                        <p className="text-sm">State: Karnataka <br/> <span className="text-xs">ರಾಜ್ಯ: ಕರ್ನಾಟಕ</span></p>
+                        <p className="text-sm">Division: Bangalore <br/> <span className="text-xs">ವಿಭಾಗ: ಬೆಂಗಳೂರು</span></p>
+                        <p className="text-sm">Language: Kannada <br/> <span className="text-xs">ಭಾಷೆ: ಕನ್ನಡ</span></p>
                         <div className="flex items-center space-x-2 text-sm mt-4">
                             <FaClock className="text-blue-500" />
-                            <span>Current Time: {currentTime} (IST)</span>
+                            <span>Current Time: {currentTime} (IST) <br/> <span className="text-xs">ಪ್ರಸ್ತುತ ಸಮಯ: {currentTime} (IST)</span></span>
                         </div>
                         <div className="flex items-center space-x-2 text-sm">
                             <FaCalendarAlt className="text-green-500" />
-                            <span>Date: {currentDate}</span>
+                            <span>Date: {currentDate} <br/> <span className="text-xs">ದಿನಾಂಕ: {currentDate}</span></span>
                         </div>
-                        <p className="text-sm">Time zone: IST (UTC+5:30)</p>
-                        <p className="text-sm">Elevation / Altitude: 661 meters. Above Seal level</p>
-                        <p className="text-sm">Telephone Code / Std Code: 08187</p>
-                        <p className="text-sm">Assembly constituency: Shikaripura assembly. constituency</p>
-                        <p className="text-sm">Assembly MLA: Vijayendra Yediyurappa</p>
-                        <p className="text-sm">Lok Sabha constituency: Shimoga parliamentary. constituency</p>
-                        <p className="text-sm">Parliament MP: B.Y.RAGHAVENDRA.</p>
-                        <p className="text-sm">Serpanch Name:-</p>
+                        <p className="text-sm">Time zone: IST (UTC+5:30) <br/> <span className="text-xs">ಸಮಯ ವಲಯ: IST (UTC+5:30)</span></p>
+                        <p className="text-sm">Elevation / Altitude: 661 meters. Above Seal level <br/> <span className="text-xs">ಎತ್ತರ / ಸಮುದ್ರ ಮಟ್ಟದಿಂದ: 661 ಮೀಟರ್</span></p>
+                        <p className="text-sm">Telephone Code / Std Code: 08187 <br/> <span className="text-xs">ದೂರವಾಣಿ ಕೋಡ್ / STD ಕೋಡ್: 08187</span></p>
+                        <p className="text-sm">Assembly constituency: Shikaripura assembly. constituency <br/> <span className="text-xs">ವಿಧಾನಸಭಾ ಕ್ಷೇತ್ರ: ಶಿಕಾರಿಪುರ ವಿಧಾನಸಭಾ ಕ್ಷೇತ್ರ</span></p>
+                        <p className="text-sm">Assembly MLA: Vijayendra Yediyurappa <br/> <span className="text-xs">ವಿಧಾನಸಭಾ ಶಾಸಕರು: ವಿಜಯೇಂದ್ರ ಯಡಿಯೂರಪ್ಪ</span></p>
+                        <p className="text-sm">Lok Sabha constituency: Shimoga parliamentary. constituency <br/> <span className="text-xs">ಲೋಕಸಭಾ ಕ್ಷೇತ್ರ: ಶಿವಮೊಗ್ಗ ಸಂಸದೀಯ ಕ್ಷೇತ್ರ</span></p>
+                        <p className="text-sm">Parliament MP: B.Y.RAGHAVENDRA. <br/> <span className="text-xs">ಸಂಸದ: ಬಿ.ವೈ.ರಾಘವೇಂದ್ರ</span></p>
+                        <p className="text-sm">Serpanch Name:- <br/> <span className="text-xs">ಸರ್ಪಂಚ್ ಹೆಸರು:-</span></p>
                         <div className="flex items-center space-x-4 mt-4">
-                            <p className="text-sm">Pin Code: 577428</p>
+                            <p className="text-sm">Pin Code: 577428 <br/> <span className="text-xs">ಪಿನ್ ಕೋಡ್: 577428</span></p>
                         </div>
-                        <p className="text-sm">Post Office Name: Shiralakoppa</p>
-                        <p className="text-sm mt-4">Commodities Prices: <a href="#" className="text-blue-500 hover:underline">Hirekerur Market / Mandi</a></p>
+                        <p className="text-sm">Post Office Name: Shiralakoppa <br/> <span className="text-xs">ಅಂಚೆ ಕಚೇರಿ ಹೆಸರು: ಶಿರಳಕೊಪ್ಪ</span></p>
+                        <p className="text-sm mt-4">Commodities Prices: <a href="#" className="text-blue-500 hover:underline">Hirekerur Market / Mandi</a> <br/> <span className="text-xs">ಸರಕುಗಳ ಬೆಲೆಗಳು: <a href="#" className="text-blue-500 hover:underline">ಹಿರೇಕೆರೂರು ಮಾರುಕಟ್ಟೆ / ಮಂಡಿ</a></span></p>
                     </div>
                 </div>
             </div>
 
             <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
-                <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details</h3>
-                <p className="text-gray-500 text-center text-lg mt-8">Click on the Search button above to search villager details.</p>
+                <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details <br/> <span className="text-xl font-normal">ಸಲ್ಲಿಸಿದ ಗ್ರಾಮಸ್ಥರ ವಿವರಗಳು</span></h3>
+                <p className="text-gray-500 text-center text-lg mt-8">Click on the Search button above to search villager details.<br/> <span className="text-base">ಗ್ರಾಮಸ್ಥರ ವಿವರಗಳನ್ನು ಹುಡುಕಲು ಮೇಲೆ ಇರುವ "ಹುಡುಕಿ" ಬಟನ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ.</span></p>
             </div>
         </div>
     );
