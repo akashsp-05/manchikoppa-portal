@@ -746,7 +746,7 @@ function HomePage({ user }) {
             <header className="sticky top-0 z-40 bg-gradient-to-r from-blue-900 to-blue-700 text-white flex flex-col items-center p-6 shadow-2xl">
                 <div className="flex items-center space-x-6 w-full justify-between mb-4">
                     {/* Buttons on the left side */}
-                    <div className="flex flex-col space-y-4">
+                    <div className="flex flex-col space-y-8">
                         <Link to="/add-villager-details" className="bg-gradient-to-r from-yellow-400 to-yellow-300 text-blue-900 px-6 py-2 rounded-full shadow-lg font-bold hover:scale-105 transition-transform duration-300">
                             Add Details
                         </Link>
