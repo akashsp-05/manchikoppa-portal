@@ -830,7 +830,7 @@ function HomePage({ user }) {
                         <p className="text-sm">District: Shimoga</p>
                         <p className="text-sm">State: Karnataka</p>
                         <p className="text-sm">Division: Bangalore</p>
-                        <p className="text-sm">Language: Kannada and Urdu</p>
+                        <p className="text-sm">Language: Kannada</p>
                         <div className="flex items-center space-x-2 text-sm mt-4">
                             <FaClock className="text-blue-500" />
                             <span>Current Time: {currentTime} (IST)</span>
@@ -846,7 +846,7 @@ function HomePage({ user }) {
                         <p className="text-sm">Assembly MLA: Vijayendra Yediyurappa</p>
                         <p className="text-sm">Lok Sabha constituency: Shimoga parliamentary. constituency</p>
                         <p className="text-sm">Parliament MP: B.Y.RAGHAVENDRA.</p>
-                        <p className="text-sm">Serpanch Name: Karibasappa</p>
+                        <p className="text-sm">Serpanch Name:-</p>
                         <div className="flex items-center space-x-4 mt-4">
                             <p className="text-sm">Pin Code: 577428</p>
                         </div>
