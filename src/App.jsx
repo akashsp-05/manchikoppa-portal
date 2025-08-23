@@ -445,6 +445,7 @@ function BusinessForm() {
     const [photoFile, setPhotoFile] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [error, setError] = useState("");
+    const [showPhotoRules, setShowPhotoRules] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -469,7 +470,6 @@ function BusinessForm() {
             return;
         }
 
-        // Set file size to 4 KB
         const maxFileSize = 4 * 1024; // 4 KB in bytes
         if (file.size > maxFileSize) {
             setError("Photo size must be less than 4 KB.");
@@ -623,6 +623,49 @@ function BusinessForm() {
                         )}
                         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                     </div>
+
+                    <div className="flex justify-center mt-4">
+                        <button
+                            type="button"
+                            onClick={() => setShowPhotoRules(!showPhotoRules)}
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition duration-300"
+                        >
+                            {showPhotoRules ? 'Hide Photo Rules' : 'Show Photo Rules'}
+                        </button>
+                    </div>
+
+                    {showPhotoRules && (
+                        <div className="mt-4 p-4 border rounded-md bg-gray-50">
+                            <h4 className="font-bold text-lg mb-2">📌 Photo Uploading Rules (English)</h4>
+                            <p className="text-sm">1. The maximum photo size allowed is 4 KB.</p>
+                            <p className="text-sm mt-2">2. To reduce your photo size, you can use this website: <a href="https://simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Simple Image Resizer</a>.</p>
+                            <p className="text-sm font-semibold mt-2">3. Steps to resize:</p>
+                            <ul className="list-disc list-inside text-sm">
+                                <li>Upload your photo.</li>
+                                <li>Select Dimensions (px) option.</li>
+                                <li>Do not select “Keep aspect ratio”.</li>
+                                <li>Set Width = 175 and Height = 175.</li>
+                                <li>Click on Resize.</li>
+                                <li>Download and upload the resized picture.</li>
+                            </ul>
+                            
+                            <hr className="my-4" />
+
+                            <h4 className="font-bold text-lg mb-2">📌 ಫೋಟೋ ಅಪ್ಲೋಡ್ ನಿಯಮಗಳು (Kannada)</h4>
+                            <p className="text-sm">1. ಗರಿಷ್ಠ ಫೋಟೋ ಗಾತ್ರ 4 KB ಇರಬೇಕು.</p>
+                            <p className="text-sm mt-2">2. ಫೋಟೋ ಗಾತ್ರ ಕಡಿಮೆ ಮಾಡಲು ಈ ವೆಬ್‌ಸೈಟ್ ಬಳಸಿ: <a href="https://simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Simple Image Resizer</a>.</p>
+                            <p className="text-sm font-semibold mt-2">3. ಫೋಟೋ ರಿಸೈಜ್ ಮಾಡುವ ವಿಧಾನ:</p>
+                            <ul className="list-disc list-inside text-sm">
+                                <li>ನಿಮ್ಮ ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
+                                <li>Dimensions (px) ಆಯ್ಕೆ ಮಾಡಿ.</li>
+                                <li>Keep aspect ratio ಆಯ್ಕೆ ಮಾಡಬೇಡಿ.</li>
+                                <li>Width = 175 ಮತ್ತು Height = 175 ನಮೂದಿಸಿ.</li>
+                                <li>Resize ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.</li>
+                                <li>ಬಂದ ಫೋಟೋವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
+                            </ul>
+                        </div>
+                    )}
+
                     {hasMembers && (
                         <div>
                             {formData.members.map((member, index) => (
@@ -647,7 +690,6 @@ function BusinessForm() {
         </div>
     );
 }
-
 function SearchPage({ user }) {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
