@@ -379,9 +379,9 @@ function BusinessPage({ user }) {
             await updateDoc(docRef, { members: businessToUpdate.members });
             alert("Staff details updated successfully!");
         } catch (error) {
-            console.error("Error updating staff details:", error);
-            alert("Failed to save changes. Please try again.");
-        }
+                console.error("Error updating staff details:", error);
+                alert("Failed to save changes. Please try again.");
+            }
     };
     
     const handleRemoveMember = async (businessId, memberToRemove) => {
@@ -407,6 +407,14 @@ function BusinessPage({ user }) {
         }
     };
 
+    const getOwnerLabel = () => {
+        return businessType === "Schools" ? "Principal" : "Owner";
+    };
+
+    const getPhotoLabel = () => {
+        return `${businessType} Photo`;
+    };
+
     return (
         <div className="p-8 max-w-5xl mx-auto">
             <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">{businessType} Details</h2>
@@ -424,11 +432,14 @@ function BusinessPage({ user }) {
                             <div className="flex flex-col items-center">
                                 <h3 className="font-bold text-xl text-blue-700 mb-2 text-center">{biz.name}</h3>
                                 {biz.photoURL && (
-                                    <img
-                                        src={biz.photoURL}
-                                        alt={`${biz.name} photo`}
-                                        className="w-32 h-32 rounded-lg object-cover flex-shrink-0 mt-2"
-                                    />
+                                    <>
+                                        <p className="text-gray-700 text-sm font-semibold mt-2">{getPhotoLabel()}:</p>
+                                        <img
+                                            src={biz.photoURL}
+                                            alt={`${biz.name} ${businessType} Photo`}
+                                            className="w-32 h-32 rounded-lg object-cover flex-shrink-0 mt-2"
+                                        />
+                                    </>
                                 )}
                             </div>
                             
@@ -437,7 +448,7 @@ function BusinessPage({ user }) {
 
                             {/* Remaining details in a new flex container */}
                             <div className="flex-1 space-y-2">
-                                {biz.ownerName && <p className="text-gray-700 text-sm">Owner/Principal: <span className="font-semibold">{biz.ownerName}</span></p>}
+                                {biz.ownerName && <p className="text-gray-700 text-sm">{getOwnerLabel()}: <span className="font-semibold">{biz.ownerName}</span></p>}
                                 {biz.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{biz.phone}</span></p>}
                                 {biz.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{biz.address}</span></p>}
                                 {biz.specification && <p className="text-gray-700 text-sm">Specification: <span className="font-semibold">{biz.specification}</span></p>}
