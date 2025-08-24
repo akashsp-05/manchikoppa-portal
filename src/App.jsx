@@ -2,16 +2,17 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import { onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
 import { db, auth } from "./firebase";
-import { collection, query, where, getDocs, deleteDoc, doc, addDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, deleteDoc, doc, addDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 import myPhoto from './myphoto.jpg';
 import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
-import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella } from "react-icons/fa";
+import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella, FaEdit, FaPlus, FaSave} from "react-icons/fa";
 
 // All components are combined into this single file for simplicity.
 import imageCompression from 'browser-image-compression';
+
 
 // ... (other imports)
 
@@ -96,7 +97,7 @@ function AdminLogin() {
 
 function VillagerForm() {
     const [formData, setFormData] = useState({
-        name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: ""
+        name: "", phone: "", work: "", address: "", age: "", dob: ""
     });
     const [photoFile, setPhotoFile] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
@@ -177,7 +178,7 @@ function VillagerForm() {
             };
             await addDoc(collection(db, "villagers"), villagerData);
             alert("Details saved successfully!");
-            setFormData({ name: "", phone: "", work: "", address: "", age: "", dob: "", locationLink: "" });
+            setFormData({ name: "", phone: "", work: "", address: "", age: "", dob: "" });
             setPhotoFile(null);
             setPhotoPreview(null);
             setShowRules(false);
@@ -218,10 +219,6 @@ function VillagerForm() {
                     <div>
                         <label className="block text-gray-700">Date of Birth</label>
                         <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
-                    </div>
-                    <div>
-                        <label className="block text-gray-700">Google Maps Live Location Link</label>
-                        <input type="url" name="locationLink" value={formData.locationLink} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" placeholder="e.g., https://goo.gl/maps/..." />
                     </div>
                     <div>
                         <label className="block text-gray-700">Profile Photo</label>
@@ -301,12 +298,11 @@ function VillagerForm() {
         </div>
     );
 }
-
 function BusinessPage({ user }) {
     const { businessType } = useParams();
     const [businesses, setBusinesses] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-
+    
     useEffect(() => {
         const fetchBusinesses = async () => {
             setIsLoading(true);
@@ -337,6 +333,80 @@ function BusinessPage({ user }) {
         }
     };
 
+    const hasMembers = ["Grama Panchayat", "Shops", "Schools", "Wine Shop", "Rice Mill", "Interlock Factory", "Milk Dairy"].includes(businessType);
+
+    const handleAddMember = async (id) => {
+        const docRef = doc(db, "businesses", id);
+        const newMember = { name: "New Staff", work: "", phone: "" };
+        
+        try {
+            await updateDoc(docRef, {
+                members: arrayUnion(newMember)
+            });
+            const updatedBusinesses = businesses.map(biz => {
+                if (biz.id === id) {
+                    return { ...biz, members: [...(biz.members || []), newMember] };
+                }
+                return biz;
+            });
+            setBusinesses(updatedBusinesses);
+            alert("New staff member added successfully!");
+        } catch (error) {
+            console.error("Error adding new staff member:", error);
+            alert("Failed to add new staff member. Please try again.");
+        }
+    };
+
+    const handleMemberChange = (businessId, index, e) => {
+        const { name, value } = e.target;
+        const updatedBusinesses = businesses.map(biz => {
+            if (biz.id === businessId) {
+                const newMembers = [...(biz.members || [])];
+                newMembers[index][name] = value;
+                return { ...biz, members: newMembers };
+            }
+            return biz;
+        });
+        setBusinesses(updatedBusinesses);
+    };
+
+    const handleSaveMembers = async (businessId) => {
+        const businessToUpdate = businesses.find(biz => biz.id === businessId);
+        if (!businessToUpdate) return;
+        
+        try {
+            const docRef = doc(db, "businesses", businessId);
+            await updateDoc(docRef, { members: businessToUpdate.members });
+            alert("Staff details updated successfully!");
+        } catch (error) {
+            console.error("Error updating staff details:", error);
+            alert("Failed to save changes. Please try again.");
+        }
+    };
+    
+    const handleRemoveMember = async (businessId, memberToRemove) => {
+        if (window.confirm("Are you sure you want to remove this staff member?")) {
+            const businessDocRef = doc(db, "businesses", businessId);
+            const businessToUpdate = businesses.find(biz => biz.id === businessId);
+            const updatedMembers = businessToUpdate.members.filter(m => m.name !== memberToRemove.name || m.phone !== memberToRemove.phone);
+
+            try {
+                await updateDoc(businessDocRef, { members: updatedMembers });
+                
+                setBusinesses(businesses.map(biz => {
+                    if (biz.id === businessId) {
+                        return { ...biz, members: updatedMembers };
+                    }
+                    return biz;
+                }));
+                alert("Staff member removed successfully!");
+            } catch (error) {
+                console.error("Error removing staff member:", error);
+                alert("Failed to remove staff member. Please try again.");
+            }
+        }
+    };
+
     return (
         <div className="p-8 max-w-5xl mx-auto">
             <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">{businessType} Details</h2>
@@ -349,38 +419,92 @@ function BusinessPage({ user }) {
             ) : businesses.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {businesses.map((biz) => (
-                        <div key={biz.id} className="bg-white p-6 rounded-lg shadow-md flex items-start space-x-4">
-                            {biz.photoURL && (
-                                <img
-                                    src={biz.photoURL}
-                                    alt={`${biz.name} photo`}
-                                    className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
-                                />
-                            )}
-                            <div className="flex-1">
-                                <h3 className="font-bold text-xl text-blue-700 mb-2">{biz.name}</h3>
-                                {biz.ownerName && <p className="text-gray-700 text-sm">Owner/Principal: <span className="font-semibold">{biz.ownerName}</span></p>}
-                                {biz.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{biz.phone}</span></p>}
-                                {biz.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{biz.address}</span></p>}
-                                {biz.specification && <p className="text-gray-700 text-sm">Specification: <span className="font-semibold">{biz.specification}</span></p>}
-                                {biz.locationLink && <p className="text-gray-700 text-sm">Location: <a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
-                                {biz.members && biz.members.length > 0 && (
-                                    <div className="mt-4">
-                                        <h4 className="font-semibold text-lg text-blue-600">Staff/Members:</h4>
-                                        <ul className="list-disc list-inside space-y-1">
-                                            {biz.members.map((member, idx) => (
-                                                <li key={idx}>
-                                                    <span className="font-medium">{member.name}</span> - {member.work} ({member.phone})
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                        <div key={biz.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col space-y-4 relative">
+                            <div className="flex items-start space-x-4">
+                                {biz.photoURL && (
+                                    <img
+                                        src={biz.photoURL}
+                                        alt={`${biz.name} photo`}
+                                        className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                                    />
                                 )}
+                                <div className="flex-1">
+                                    <h3 className="font-bold text-xl text-blue-700 mb-2">{biz.name}</h3>
+                                    {biz.ownerName && <p className="text-gray-700 text-sm">Owner/Principal: <span className="font-semibold">{biz.ownerName}</span></p>}
+                                    {biz.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{biz.phone}</span></p>}
+                                    {biz.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{biz.address}</span></p>}
+                                    {biz.specification && <p className="text-gray-700 text-sm">Specification: <span className="font-semibold">{biz.specification}</span></p>}
+                                    {biz.locationLink && <p className="text-gray-700 text-sm">Location: <a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
+                                </div>
                             </div>
+
+                            {/* Public View: Read-only Staff Details */}
+                            {!user && hasMembers && (
+                                <div className="mt-4">
+                                    <h4 className="font-semibold text-lg text-blue-600 mb-2">Staff/Members:</h4>
+                                    <ul className="list-disc list-inside space-y-1">
+                                        {(biz.members || []).map((member, idx) => (
+                                            <li key={idx}>
+                                                <span className="font-medium">{member.name}</span> - {member.work} ({member.phone})
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            {/* Admin View: Editable Staff Details */}
+                            {user && hasMembers && (
+                                <div className="mt-4">
+                                    <h4 className="font-semibold text-lg text-blue-600 mb-2">Staff/Members:</h4>
+                                    <div className="space-y-4">
+                                        {(biz.members || []).map((member, idx) => (
+                                            <div key={idx} className="flex flex-col space-y-2 border p-3 rounded-md">
+                                                <div className="flex items-center space-x-2">
+                                                    <input
+                                                        type="text"
+                                                        name="name"
+                                                        value={member.name}
+                                                        onChange={(e) => handleMemberChange(biz.id, idx, e)}
+                                                        className="flex-1 px-2 py-1 border rounded-md text-sm"
+                                                        placeholder="Name"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        name="work"
+                                                        value={member.work}
+                                                        onChange={(e) => handleMemberChange(biz.id, idx, e)}
+                                                        className="flex-1 px-2 py-1 border rounded-md text-sm"
+                                                        placeholder="Work"
+                                                    />
+                                                    <input
+                                                        type="tel"
+                                                        name="phone"
+                                                        value={member.phone}
+                                                        onChange={(e) => handleMemberChange(biz.id, idx, e)}
+                                                        className="flex-1 px-2 py-1 border rounded-md text-sm"
+                                                        placeholder="Phone"
+                                                    />
+                                                    <button onClick={() => handleRemoveMember(biz.id, member)} className="text-red-500 hover:text-red-700 text-sm"><FaTrash /></button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="flex space-x-2 mt-4">
+                                        <button onClick={() => handleAddMember(biz.id)} className="flex items-center space-x-2 bg-green-500 text-white py-1 px-3 rounded-md hover:bg-green-600 transition duration-200 text-sm">
+                                            <FaPlus />
+                                            <span>Add Staff</span>
+                                        </button>
+                                        <button onClick={() => handleSaveMembers(biz.id)} className="flex items-center space-x-2 bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 transition duration-200 text-sm">
+                                            <FaSave />
+                                            <span>Save</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
                             {user && (
-                                <button onClick={() => handleDeleteBusiness(biz.id)} className="flex items-center space-x-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-200 text-sm">
+                                <button onClick={() => handleDeleteBusiness(biz.id)} className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition duration-200 text-sm flex items-center justify-center">
                                     <FaTrash />
-                                    <span>Delete</span>
                                 </button>
                             )}
                         </div>
@@ -392,6 +516,121 @@ function BusinessPage({ user }) {
         </div>
     );
 }
+function EditStaffForm() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [business, setBusiness] = useState(null);
+    const [members, setMembers] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchBusiness = async () => {
+            try {
+                const docRef = doc(db, "businesses", id);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    setBusiness(data);
+                    setMembers(data.members || []);
+                } else {
+                    setError("No such business found!");
+                }
+            } catch (err) {
+                console.error("Error fetching document:", err);
+                setError("Failed to fetch business details.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchBusiness();
+    }, [id]);
+
+    const handleMemberChange = (index, e) => {
+        const { name, value } = e.target;
+        const newMembers = [...members];
+        newMembers[index][name] = value;
+        setMembers(newMembers);
+    };
+
+    const handleAddMember = () => {
+        setMembers([...members, { name: "", work: "", phone: "" }]);
+    };
+
+    const handleRemoveMember = (index) => {
+        const newMembers = [...members];
+        newMembers.splice(index, 1);
+        setMembers(newMembers);
+    };
+
+    const handleUpdate = async (e) => {
+        e.preventDefault();
+        setIsUpdating(true);
+        try {
+            const docRef = doc(db, "businesses", id);
+            await updateDoc(docRef, { members: members });
+            alert("Staff/Members updated successfully!");
+            navigate(`/business/${business.type}`);
+        } catch (err) {
+            console.error("Error updating document:", err);
+            alert("Failed to update staff. Please try again.");
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    if (isLoading) {
+        return <div className="text-center mt-8">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="text-center mt-8 text-red-500">{error}</div>;
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
+                <h2 className="text-2xl font-bold text-center mb-6">Edit Staff/Members for {business.name}</h2>
+                <form onSubmit={handleUpdate} className="space-y-4">
+                    <div>
+                        <h3 className="text-xl font-bold mt-6 mb-4">Staff/Members Details</h3>
+                        <ul className="list-disc list-inside space-y-4">
+                            {members.map((member, index) => (
+                                <li key={index} className="border p-4 rounded-md relative">
+                                    <h4 className="font-semibold mb-2">Staff/Member {index + 1}</h4>
+                                    <div className="space-y-2">
+                                        <div>
+                                            <label className="block text-gray-700">Name</label>
+                                            <input type="text" name="name" value={member.name} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" placeholder="Name" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700">Work</label>
+                                            <input type="text" name="work" value={member.work} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" placeholder="Work" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700">Phone</label>
+                                            <input type="tel" name="phone" value={member.phone} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" placeholder="Phone" />
+                                        </div>
+                                    </div>
+                                    {members.length > 1 && (
+                                        <button type="button" onClick={() => handleRemoveMember(index)} className="mt-2 text-red-500 hover:text-red-700 text-sm">Remove</button>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                        <button type="button" onClick={handleAddMember} className="w-full bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300 mt-4">Add Another Staff/Member</button>
+                    </div>
+                    <button type="submit" disabled={isUpdating} className={`w-full text-white py-2 px-4 rounded-md transition duration-300 ${isUpdating ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}>
+                        {isUpdating ? 'Updating...' : 'Update Staff'}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+}
+
 function BusinessForm() {
     const { businessType } = useParams();
     const navigate = useNavigate();
@@ -1133,6 +1372,7 @@ function App() {
                 <Route path="/admin-feedback" element={<FeedbackPage user={user} />} />
                 <Route path="/announcements" element={<AnnouncementList />} />
                 <Route path="/add-announcement" element={<AnnouncementForm />} />
+                <Route path="/edit-staff/:id" element={<EditStaffForm />} />
             </Routes>
         </Router>
     );
