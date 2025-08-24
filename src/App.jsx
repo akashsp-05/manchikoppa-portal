@@ -11,7 +11,23 @@ import AnnouncementList from './AnnouncementList';
 import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella } from "react-icons/fa";
 
 // All components are combined into this single file for simplicity.
+import imageCompression from 'browser-image-compression';
 
+// ... (other imports)
+
+// Asynchronously checks image dimensions
+const getImageDimensions = (file) => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            resolve({ width: img.width, height: img.height });
+        };
+        img.onerror = () => {
+            reject(new Error("Failed to load image."));
+        };
+        img.src = URL.createObjectURL(file);
+    });
+};
 const storage = getStorage();
 
 function AdminLogin() {
@@ -85,7 +101,8 @@ function VillagerForm() {
     const [photoFile, setPhotoFile] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
     const [error, setError] = useState("");
-    const [showRules, setShowRules] = useState(false); // State to toggle rules visibility
+    const [showRules, setShowRules] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -93,7 +110,7 @@ function VillagerForm() {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handlePhotoChange = (e) => {
+    const handlePhotoChange = async (e) => {
         const file = e.target.files[0];
         if (!file) {
             setPhotoFile(null);
@@ -111,20 +128,31 @@ function VillagerForm() {
             return;
         }
 
-        const maxFileSize = 4 * 1024; // 4 KB in bytes
-        if (file.size > maxFileSize) {
-            setError("Photo size must be less than 4 KB.");
+        try {
+            const { width, height } = await getImageDimensions(file);
+            let processedFile = file;
+
+            // Check if compression is needed
+            if (width > 145 || height > 175) {
+                const options = {
+                    maxSizeMB: 0.05, // 50 KB
+                    maxWidthOrHeight: 175,
+                    useWebWorker: true,
+                };
+                processedFile = await imageCompression(file, options);
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreview(reader.result);
+            };
+            reader.readAsDataURL(processedFile);
+            setPhotoFile(processedFile);
+        } catch (err) {
+            setError("Failed to compress image automatically. Please resize the photo manually using the instructions below.");
             setPhotoFile(null);
             setPhotoPreview(null);
-            return;
         }
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setPhotoPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-        setPhotoFile(file);
     };
 
     const handleSubmit = async (e) => {
@@ -134,6 +162,8 @@ function VillagerForm() {
             alert(error || "Please select a photo to upload.");
             return;
         }
+
+        setIsUploading(true);
 
         try {
             const photoRef = ref(storage, `villager_photos/${uuidv4()}-${photoFile.name}`);
@@ -155,6 +185,8 @@ function VillagerForm() {
         } catch (error) {
             console.error("Error adding document:", error);
             alert("Failed to save details. Please try again.");
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -213,9 +245,10 @@ function VillagerForm() {
                         </button>
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+                            disabled={isUploading}
+                            className={`py-2 px-4 rounded-md transition duration-300 ${isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
                         >
-                            Save Details
+                            {isUploading ? 'Saving...' : 'Save Details'}
                         </button>
                     </div>
                 </form>
@@ -227,14 +260,15 @@ function VillagerForm() {
                             <div>
                                 <h4 className="font-semibold text-lg">📌 Photo Uploading Rules (English)</h4>
                                 <ol className="list-decimal list-inside space-y-2 text-gray-700">
-                                    <li>The maximum photo size allowed is 4 KB.</li>
-                                    <li>To reduce your photo size, you can use this website: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Simple Image Resizer</a>.</li>
-                                    <li>Steps to resize:
+                                    <li>The maximum photo dimensions allowed are 145px width and 175px height.</li>
+                                    <li>Our system will **automatically attempt to compress** your photo to meet the requirements.</li>
+                                    <li>If the automatic compression fails, you must **manually resize** your photo using this website: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Simple Image Resizer</a>.</li>
+                                    <li>Steps for manual resize:
                                         <ul className="list-disc list-inside ml-4 space-y-1">
                                             <li>Upload your photo.</li>
                                             <li>Select **Dimensions (px)** option.</li>
                                             <li>Do not select **“Keep aspect ratio”**.</li>
-                                            <li>Set **Width = 175** and **Height = 175**.</li>
+                                            <li>Set **Width = 145** and **Height = 175**.</li>
                                             <li>Click on **Resize**.</li>
                                             <li>Download and upload the resized picture.</li>
                                         </ul>
@@ -245,14 +279,15 @@ function VillagerForm() {
                             <div>
                                 <h4 className="font-semibold text-lg">📌 ಫೋಟೋ ಅಪ್ಲೋಡ್ ನಿಯಮಗಳು (Kannada)</h4>
                                 <ol className="list-decimal list-inside space-y-2 text-gray-700">
-                                    <li>ಗರಿಷ್ಠ ಫೋಟೋ ಗಾತ್ರ 4 KB ಇರಬೇಕು.</li>
-                                    <li>ಫೋಟೋ ಗಾತ್ರ ಕಡಿಮೆ ಮಾಡಲು ಈ ವೆಬ್‌ಸೈಟ್ ಬಳಸಿ: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Simple Image Resizer</a>.</li>
+                                    <li>ಗರಿಷ್ಠ ಫೋಟೋ ಗಾತ್ರವು 145px ಅಗಲ ಮತ್ತು 175px ಎತ್ತರ ಇರಬೇಕು.</li>
+                                    <li>ನಿಮ್ಮ ಫೋಟೋವನ್ನು ಅಗತ್ಯವಿರುವ ಗಾತ್ರಕ್ಕೆ **ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಕುಗ್ಗಿಸಲು** ನಮ್ಮ ವ್ಯವಸ್ಥೆಯು ಪ್ರಯತ್ನಿಸುತ್ತದೆ.</li>
+                                    <li>ಸ್ವಯಂಚಾಲಿತ ಕುಗ್ಗಿಸುವಿಕೆ ವಿಫಲವಾದರೆ, ನೀವು ಈ ವೆಬ್‌ಸೈಟ್ ಬಳಸಿ ಫೋಟೋವನ್ನು **ಕೈಯಾರೆ ರಿಸೈಜ್ ಮಾಡಬೇಕು**: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Simple Image Resizer</a>.</li>
                                     <li>ಫೋಟೋ ರಿಸೈಜ್ ಮಾಡುವ ವಿಧಾನ:
                                         <ul className="list-disc list-inside ml-4 space-y-1">
                                             <li>ನಿಮ್ಮ ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
                                             <li>**Dimensions (px)** ಆಯ್ಕೆ ಮಾಡಿ.</li>
                                             <li>**Keep aspect ratio** ಆಯ್ಕೆ ಮಾಡಬೇಡಿ.</li>
-                                            <li>**Width = 175** ಮತ್ತು **Height = 175** ನಮೂದಿಸಿ.</li>
+                                            <li>**Width = 145** ಮತ್ತು **Height = 175** ನಮೂದಿಸಿ.</li>
                                             <li>**Resize** ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.</li>
                                             <li>ಬಂದ ಫೋಟೋವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
                                         </ul>
@@ -263,84 +298,6 @@ function VillagerForm() {
                     </div>
                 )}
             </div>
-        </div>
-    );
-}
-
-
-function VillagersPage() {
-    const [villagers, setVillagers] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-
-    useEffect(() => {
-        const fetchVillagers = async () => {
-            setIsLoading(true);
-            try {
-                const villagersCol = collection(db, "villagers");
-                const villagerSnapshot = await getDocs(villagersCol);
-                const villagerList = villagerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setVillagers(villagerList);
-            } catch (error) {
-                console.error("Error fetching villagers:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchVillagers();
-    }, []);
-
-    const filteredVillagers = villagers.filter(villager => {
-        const lowerCaseSearch = searchTerm.toLowerCase();
-        return (
-            (villager.name && villager.name.toLowerCase().includes(lowerCaseSearch)) ||
-            (villager.work && villager.work.toLowerCase().includes(lowerCaseSearch)) ||
-            (villager.phone && villager.phone.includes(lowerCaseSearch))
-        );
-    });
-
-    return (
-        <div className="p-8 bg-gray-50 min-h-screen">
-            <h2 className="text-3xl font-bold text-center mb-6 text-blue-800">Search Villager Details</h2>
-            <div className="max-w-xl mx-auto mb-6">
-                <input
-                    type="text"
-                    placeholder="Search by name, work, or phone..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full p-4 border border-gray-300 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-            </div>
-            {isLoading ? (
-                <p className="text-center text-gray-500 text-lg">Loading...</p>
-            ) : filteredVillagers.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredVillagers.map((villager) => (
-                        <div key={villager.id} className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center space-x-4">
-                            {villager.photoURL && (
-                                <img
-                                    src={villager.photoURL}
-                                    alt={villager.name}
-                                    className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-                                />
-                            )}
-                            <div>
-                                <h3 className="font-bold text-xl text-blue-700 mb-2">{villager.name}</h3>
-                                <div className="text-gray-600 space-y-1 text-sm">
-                                    <p><span className="font-semibold">Phone:</span> {villager.phone}</p>
-                                    <p><span className="font-semibold">Work:</span> {villager.work}</p>
-                                    <p><span className="font-semibold">Address:</span> {villager.address}</p>
-                                    <p><span className="font-semibold">Age:</span> {villager.age}</p>
-                                    <p><span className="font-semibold">DOB:</span> {villager.dob}</p>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                <p className="text-center text-gray-500 text-lg">No villagers found matching your search.</p>
-            )}
         </div>
     );
 }
@@ -446,13 +403,14 @@ function BusinessForm() {
     const [photoPreview, setPhotoPreview] = useState(null);
     const [error, setError] = useState("");
     const [showPhotoRules, setShowPhotoRules] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handlePhotoChange = (e) => {
+    const handlePhotoChange = async (e) => {
         const file = e.target.files[0];
         if (!file) {
             setPhotoFile(null);
@@ -462,7 +420,7 @@ function BusinessForm() {
         }
 
         setError("");
-        
+
         if (!file.type.startsWith('image/')) {
             setError("Please upload a valid image file.");
             setPhotoFile(null);
@@ -470,20 +428,31 @@ function BusinessForm() {
             return;
         }
 
-        const maxFileSize = 4 * 1024; // 4 KB in bytes
-        if (file.size > maxFileSize) {
-            setError("Photo size must be less than 4 KB.");
+        try {
+            const { width, height } = await getImageDimensions(file);
+            let processedFile = file;
+
+            // Check if compression is needed
+            if (width > 145 || height > 175) {
+                const options = {
+                    maxSizeMB: 0.05, // 50 KB
+                    maxWidthOrHeight: 175,
+                    useWebWorker: true,
+                };
+                processedFile = await imageCompression(file, options);
+            }
+            
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPhotoPreview(reader.result);
+            };
+            reader.readAsDataURL(processedFile);
+            setPhotoFile(processedFile);
+        } catch (err) {
+            setError("Failed to compress image automatically. Please resize the photo manually using the instructions below.");
             setPhotoFile(null);
             setPhotoPreview(null);
-            return;
         }
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setPhotoPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-        setPhotoFile(file);
     };
 
     const handleMemberChange = (index, e) => {
@@ -505,12 +474,14 @@ function BusinessForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (error || !photoFile) {
             alert(error || "Please select a photo to upload.");
             return;
         }
-        
+
+        setIsUploading(true);
+
         try {
             let photoURL = "";
             const photoRef = ref(storage, `business_photos/${uuidv4()}-${photoFile.name}`);
@@ -563,6 +534,8 @@ function BusinessForm() {
         } catch (error) {
             console.error("Error adding document:", error);
             alert("Failed to add details. Please try again.");
+        } finally {
+            setIsUploading(false);
         }
     };
 
@@ -637,29 +610,31 @@ function BusinessForm() {
                     {showPhotoRules && (
                         <div className="mt-4 p-4 border rounded-md bg-gray-50">
                             <h4 className="font-bold text-lg mb-2">📌 Photo Uploading Rules (English)</h4>
-                            <p className="text-sm">1. The maximum photo size allowed is 4 KB.</p>
-                            <p className="text-sm mt-2">2. To reduce your photo size, you can use this website: <a href="https://simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Simple Image Resizer</a>.</p>
-                            <p className="text-sm font-semibold mt-2">3. Steps to resize:</p>
+                            <p className="text-sm">1. The maximum photo dimensions allowed are 145px width and 175px height.</p>
+                            <p className="text-sm">2. Our system will **automatically attempt to compress** your photo to meet the requirements.</p>
+                            <p className="text-sm mt-2">3. If the automatic compression fails, you must **manually resize** your photo using this website: <a href="https://simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Simple Image Resizer</a>.</p>
+                            <p className="text-sm font-semibold mt-2">4. Steps for manual resize:</p>
                             <ul className="list-disc list-inside text-sm">
                                 <li>Upload your photo.</li>
                                 <li>Select Dimensions (px) option.</li>
                                 <li>Do not select “Keep aspect ratio”.</li>
-                                <li>Set Width = 175 and Height = 175.</li>
+                                <li>Set Width = 145 and Height = 175.</li>
                                 <li>Click on Resize.</li>
                                 <li>Download and upload the resized picture.</li>
                             </ul>
-                            
+
                             <hr className="my-4" />
 
                             <h4 className="font-bold text-lg mb-2">📌 ಫೋಟೋ ಅಪ್ಲೋಡ್ ನಿಯಮಗಳು (Kannada)</h4>
-                            <p className="text-sm">1. ಗರಿಷ್ಠ ಫೋಟೋ ಗಾತ್ರ 4 KB ಇರಬೇಕು.</p>
-                            <p className="text-sm mt-2">2. ಫೋಟೋ ಗಾತ್ರ ಕಡಿಮೆ ಮಾಡಲು ಈ ವೆಬ್‌ಸೈಟ್ ಬಳಸಿ: <a href="https://simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Simple Image Resizer</a>.</p>
-                            <p className="text-sm font-semibold mt-2">3. ಫೋಟೋ ರಿಸೈಜ್ ಮಾಡುವ ವಿಧಾನ:</p>
+                            <p className="text-sm">1. ಗರಿಷ್ಠ ಫೋಟೋ ಗಾತ್ರವು 145px ಅಗಲ ಮತ್ತು 175px ಎತ್ತರ ಇರಬೇಕು.</p>
+                            <p className="text-sm">2. ನಿಮ್ಮ ಫೋಟೋವನ್ನು ಅಗತ್ಯವಿರುವ ಗಾತ್ರಕ್ಕೆ **ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಕುಗ್ಗಿಸಲು** ನಮ್ಮ ವ್ಯವಸ್ಥೆಯು ಪ್ರಯತ್ನಿಸುತ್ತದೆ.</p>
+                            <p className="text-sm mt-2">3. ಸ್ವಯಂಚಾಲಿತ ಕುಗ್ಗಿಸುವಿಕೆ ವಿಫಲವಾದರೆ, ನೀವು ಈ ವೆಬ್‌ಸೈಟ್ ಬಳಸಿ ಫೋಟೋವನ್ನು **ಕೈಯಾರೆ ರಿಸೈಜ್ ಮಾಡಬೇಕು**: <a href="https://simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Simple Image Resizer</a>.</p>
+                            <p className="text-sm font-semibold mt-2">4. ಫೋಟೋ ರಿಸೈಜ್ ಮಾಡುವ ವಿಧಾನ:</p>
                             <ul className="list-disc list-inside text-sm">
                                 <li>ನಿಮ್ಮ ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
                                 <li>Dimensions (px) ಆಯ್ಕೆ ಮಾಡಿ.</li>
                                 <li>Keep aspect ratio ಆಯ್ಕೆ ಮಾಡಬೇಡಿ.</li>
-                                <li>Width = 175 ಮತ್ತು Height = 175 ನಮೂದಿಸಿ.</li>
+                                <li>Width = 145 ಮತ್ತು Height = 175 ನಮೂದಿಸಿ.</li>
                                 <li>Resize ಬಟನ್ ಕ್ಲಿಕ್ ಮಾಡಿ.</li>
                                 <li>ಬಂದ ಫೋಟೋವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
                             </ul>
@@ -668,28 +643,43 @@ function BusinessForm() {
 
                     {hasMembers && (
                         <div>
-                            {formData.members.map((member, index) => (
-                                <div key={index} className="border p-4 rounded-md relative mt-4">
-                                    <h4 className="font-semibold">Staff/Member {index + 1}</h4>
-                                    <div className="space-y-2 mt-2">
-                                        <input type="text" name="name" placeholder="Name" value={member.name} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" />
-                                        <input type="text" name="work" placeholder="Work" value={member.work} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" />
-                                        <input type="tel" name="phone" placeholder="Phone" value={member.phone} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" />
-                                    </div>
-                                    {formData.members.length > 1 && (
-                                        <button type="button" onClick={() => handleRemoveMember(index)} className="absolute top-2 right-2 text-red-500 hover:text-red-700">Remove</button>
-                                    )}
-                                </div>
-                            ))}
+                            <h3 className="text-xl font-bold mt-6 mb-4">Staff/Members Details</h3>
+                            <ul className="list-disc list-inside space-y-4">
+                                {formData.members.map((member, index) => (
+                                    <li key={index} className="border p-4 rounded-md relative">
+                                        <h4 className="font-semibold mb-2">Staff/Member {index + 1}</h4>
+                                        <div className="space-y-2">
+                                            <div>
+                                                <label className="block text-gray-700">Name</label>
+                                                <input type="text" name="name" value={member.name} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" placeholder="Name" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-gray-700">Work</label>
+                                                <input type="text" name="work" value={member.work} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" placeholder="Work" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-gray-700">Phone</label>
+                                                <input type="tel" name="phone" value={member.phone} onChange={(e) => handleMemberChange(index, e)} className="w-full px-3 py-2 border rounded-md" placeholder="Phone" />
+                                            </div>
+                                        </div>
+                                        {formData.members.length > 1 && (
+                                            <button type="button" onClick={() => handleRemoveMember(index)} className="mt-2 text-red-500 hover:text-red-700 text-sm">Remove</button>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
                             <button type="button" onClick={handleAddMember} className="w-full bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300 mt-4">Add Another Staff/Member</button>
                         </div>
                     )}
-                    <button type="submit" className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 mt-4">Save Details</button>
+                    <button type="submit" disabled={isUploading} className={`w-full text-white py-2 px-4 rounded-md transition duration-300 ${isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'}`}>
+                        {isUploading ? 'Saving...' : 'Save Details'}
+                    </button>
                 </form>
             </div>
         </div>
     );
 }
+
 function SearchPage({ user }) {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
