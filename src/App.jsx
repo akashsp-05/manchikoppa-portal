@@ -420,35 +420,43 @@ function BusinessPage({ user }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {businesses.map((biz) => (
                         <div key={biz.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col space-y-4 relative">
-                            <div className="flex items-start space-x-4">
+                            {/* Reordered to show Name and Photo first */}
+                            <div className="flex flex-col items-center">
+                                <h3 className="font-bold text-xl text-blue-700 mb-2 text-center">{biz.name}</h3>
                                 {biz.photoURL && (
                                     <img
                                         src={biz.photoURL}
                                         alt={`${biz.name} photo`}
-                                        className="w-24 h-24 rounded-lg object-cover flex-shrink-0"
+                                        className="w-32 h-32 rounded-lg object-cover flex-shrink-0 mt-2"
                                     />
                                 )}
-                                <div className="flex-1">
-                                    <h3 className="font-bold text-xl text-blue-700 mb-2">{biz.name}</h3>
-                                    {biz.ownerName && <p className="text-gray-700 text-sm">Owner/Principal: <span className="font-semibold">{biz.ownerName}</span></p>}
-                                    {biz.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{biz.phone}</span></p>}
-                                    {biz.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{biz.address}</span></p>}
-                                    {biz.specification && <p className="text-gray-700 text-sm">Specification: <span className="font-semibold">{biz.specification}</span></p>}
-                                    {biz.locationLink && <p className="text-gray-700 text-sm">Location: <a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
-                                </div>
+                            </div>
+                            
+                            {/* Horizontal line as a separator */}
+                            <hr className="my-4" />
+
+                            {/* Remaining details in a new flex container */}
+                            <div className="flex-1 space-y-2">
+                                {biz.ownerName && <p className="text-gray-700 text-sm">Owner/Principal: <span className="font-semibold">{biz.ownerName}</span></p>}
+                                {biz.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{biz.phone}</span></p>}
+                                {biz.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{biz.address}</span></p>}
+                                {biz.specification && <p className="text-gray-700 text-sm">Specification: <span className="font-semibold">{biz.specification}</span></p>}
+                                {biz.locationLink && <p className="text-gray-700 text-sm">Location: <a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
                             </div>
 
                             {/* Public View: Read-only Staff Details */}
                             {!user && hasMembers && (
                                 <div className="mt-4">
                                     <h4 className="font-semibold text-lg text-blue-600 mb-2">Staff/Members:</h4>
-                                    <ul className="list-disc list-inside space-y-1">
+                                    <ol className="list-decimal list-inside space-y-1">
                                         {(biz.members || []).map((member, idx) => (
                                             <li key={idx}>
-                                                <span className="font-medium">{member.name}</span> - {member.work} ({member.phone})
+                                                <p className="text-gray-700 text-sm">Name: <span className="font-semibold">{member.name}</span></p>
+                                                <p className="text-gray-700 text-sm">Work: <span className="font-semibold">{member.work}</span></p>
+                                                <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{member.phone}</span></p>
                                             </li>
                                         ))}
-                                    </ul>
+                                    </ol>
                                 </div>
                             )}
 
@@ -516,6 +524,7 @@ function BusinessPage({ user }) {
         </div>
     );
 }
+
 function EditStaffForm() {
     const { id } = useParams();
     const navigate = useNavigate();
