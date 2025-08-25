@@ -8,8 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import myPhoto from './myphoto.jpg';
 import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
-import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella, FaEdit, FaPlus, FaSave, FaImage, FaArrowLeft, FaBirthdayCake} from "react-icons/fa";
-
+import { FaUser, FaPhone, FaBriefcase, FaMapMarkerAlt, FaStar, FaInfoCircle, FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella, FaEdit, FaPlus, FaSave, FaImage, FaArrowLeft, FaBirthdayCake} from "react-icons/fa";
 // All components are combined into this single file for simplicity.
 import imageCompression from 'browser-image-compression';
 
@@ -502,6 +501,16 @@ function BusinessPage({ user }) {
                                         <p className="text-gray-800 text-md">Location: <a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 transition duration-300">View on Map</a></p>
                                     </div>
                                 }
+                                {/* New Extra Details Box */}
+                                {biz.extraDetails && (
+                                    <div className="flex items-start space-x-3 mt-4">
+                                        <FaInfoCircle className="text-purple-600 text-lg flex-shrink-0" />
+                                        <div className="flex-1">
+                                            <p className="text-gray-800 text-md font-semibold">Extra Details:</p>
+                                            <p className="text-gray-700 text-sm mt-1 whitespace-pre-line">{biz.extraDetails}</p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Staff/Members Section */}
@@ -720,6 +729,7 @@ function BusinessForm() {
     const [formData, setFormData] = useState({
         name: "", phone: "", address: "", locationLink: "", specification: "", ownerName: "",
         members: [{ name: "", work: "", phone: "" }],
+        extraDetails: "", // Added this line
     });
     const [photoFile, setPhotoFile] = useState(null);
     const [photoPreview, setPhotoPreview] = useState(null);
@@ -818,6 +828,7 @@ function BusinessForm() {
                 phone: formData.phone,
                 locationLink: formData.locationLink,
                 photoURL: photoURL,
+                extraDetails: formData.extraDetails, // Added this line
             };
 
             const isIndividual = ["Electrician", "Doctors", "Engineers", "Teachers"].includes(businessType);
@@ -831,6 +842,7 @@ function BusinessForm() {
                     address: formData.address,
                     locationLink: formData.locationLink,
                     photoURL: photoURL,
+                    extraDetails: formData.extraDetails, // Added this line
                 };
             } else if (isIndividual) {
                 dataToSave = {
@@ -906,6 +918,10 @@ function BusinessForm() {
                     <div>
                         <label className="block text-gray-700">Location Link</label>
                         <input type="url" name="locationLink" value={formData.locationLink} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Extra Details</label>
+                        <textarea name="extraDetails" value={formData.extraDetails} onChange={handleChange} rows="4" className="w-full px-3 py-2 border rounded-md resize-y"></textarea>
                     </div>
                     <div>
                         <label className="block text-gray-700">Business/Service Photo</label>
@@ -1001,6 +1017,7 @@ function BusinessForm() {
         </div>
     );
 }
+
 
 function SearchPage({ user }) {
     const [searchResults, setSearchResults] = useState([]);
