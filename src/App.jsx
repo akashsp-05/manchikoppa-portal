@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import myPhoto from './myphoto.jpg';
 import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
-import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella, FaEdit, FaPlus, FaSave} from "react-icons/fa";
+import { FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaMapMarkerAlt, FaPhone, FaUser, FaBriefcase, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella, FaEdit, FaPlus, FaSave, FaImage, FaArrowLeft, FaBirthdayCake} from "react-icons/fa";
 
 // All components are combined into this single file for simplicity.
 import imageCompression from 'browser-image-compression';
@@ -192,58 +192,84 @@ function VillagerForm() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-                <h2 className="text-2xl font-bold text-center mb-6">Add Villager Details</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-gray-700">Name</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+        <div className="min-h-screen bg-blue-100 flex items-center justify-center p-4">
+            <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg relative">
+                <Link to="/" className="absolute top-4 left-4 text-gray-500 hover:text-blue-500 transition duration-300">
+                    <FaArrowLeft className="w-6 h-6" />
+                </Link>
+                <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Add Villager Details</h2>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="flex items-center space-x-4">
+                        <FaUser className="text-blue-500 text-xl" />
+                        <div className="flex-1">
+                            <label className="block text-gray-700 font-medium mb-1">Name</label>
+                            <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Phone</label>
-                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    <div className="flex items-center space-x-4">
+                        <FaPhone className="text-green-500 text-xl" />
+                        <div className="flex-1">
+                            <label className="block text-gray-700 font-medium mb-1">Phone</label>
+                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" placeholder="e.g., +91 9876543210" />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Work</label>
-                        <input type="text" name="work" value={formData.work} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    <div className="flex items-center space-x-4">
+                        <FaBriefcase className="text-purple-500 text-xl" />
+                        <div className="flex-1">
+                            <label className="block text-gray-700 font-medium mb-1">Work</label>
+                            <input type="text" name="work" value={formData.work} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Address</label>
-                        <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    <div className="flex items-center space-x-4">
+                        <FaMapMarkerAlt className="text-red-500 text-xl" />
+                        <div className="flex-1">
+                            <label className="block text-gray-700 font-medium mb-1">Address</label>
+                            <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Age</label>
-                        <input type="number" name="age" value={formData.age} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    <div className="flex items-center space-x-4">
+                        <FaBirthdayCake className="text-orange-500 text-xl" />
+                        <div className="flex-1">
+                            <label className="block text-gray-700 font-medium mb-1">Age</label>
+                            <input type="number" name="age" value={formData.age} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Date of Birth</label>
-                        <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" />
+                    <div className="flex items-center space-x-4">
+                        <FaCalendarAlt className="text-teal-500 text-xl" />
+                        <div className="flex-1">
+                            <label className="block text-gray-700 font-medium mb-1">Date of Birth</label>
+                            <input type="date" name="dob" value={formData.dob} onChange={handleChange} className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200" />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-gray-700">Profile Photo</label>
-                        <input type="file" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-md" accept="image/*" />
+                    <div className="space-y-2">
+                        <div className="flex items-center space-x-4">
+                            <FaImage className="text-gray-500 text-xl" />
+                            <div className="flex-1">
+                                <label className="block text-gray-700 font-medium mb-1">Profile Photo</label>
+                                <input type="file" onChange={handlePhotoChange} className="w-full px-4 py-2 border rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" accept="image/*" />
+                            </div>
+                        </div>
                         {photoPreview && (
                             <div className="mt-4 flex flex-col items-center">
                                 <span className="text-gray-700 mb-2">Image Preview:</span>
-                                <img src={photoPreview} alt="Profile Preview" className="w-24 h-24 object-cover rounded-full border border-gray-300" />
+                                <img src={photoPreview} alt="Profile Preview" className="w-24 h-24 object-cover rounded-full border-4 border-gray-200 shadow-md" />
                             </div>
                         )}
-                        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+                        {error && <p className="text-red-500 text-sm mt-1 text-center">{error}</p>}
                     </div>
 
                     <div className="flex justify-between items-center pt-2">
                         <button
                             type="button"
                             onClick={() => setShowRules(!showRules)}
-                            className="text-sm text-blue-500 underline hover:no-underline"
+                            className="text-sm text-blue-500 underline hover:no-underline transition duration-300"
                         >
                             {showRules ? "Hide Photo Rules" : "Show Photo Rules"}
                         </button>
                         <button
                             type="submit"
                             disabled={isUploading}
-                            className={`py-2 px-4 rounded-md transition duration-300 ${isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                            className={`py-2 px-6 rounded-md font-semibold transition duration-300 shadow-md ${isUploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'}`}
                         >
                             {isUploading ? 'Saving...' : 'Save Details'}
                         </button>
@@ -251,15 +277,17 @@ function VillagerForm() {
                 </form>
 
                 {showRules && (
-                    <div className="mt-6 border-t pt-6">
-                        <h3 className="text-xl font-bold text-center mb-4">Photo Uploading Rules</h3>
+                    <div className="mt-6 border-t pt-6 space-y-4">
+                        <h3 className="text-xl font-bold text-center text-gray-800">Photo Uploading Rules</h3>
                         <div className="space-y-4">
                             <div>
-                                <h4 className="font-semibold text-lg">📌 Photo Uploading Rules (English)</h4>
-                                <ol className="list-decimal list-inside space-y-2 text-gray-700">
+                                <h4 className="font-semibold text-lg text-gray-700 flex items-center">
+                                    <span className="mr-2 text-yellow-500">📌</span>Photo Uploading Rules (English)
+                                </h4>
+                                <ol className="list-decimal list-inside space-y-2 text-gray-700 mt-2">
                                     <li>The maximum photo dimensions allowed are 145px width and 175px height.</li>
                                     <li>Our system will **automatically attempt to compress** your photo to meet the requirements.</li>
-                                    <li>If the automatic compression fails, you must **manually resize** your photo using this website: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Simple Image Resizer</a>.</li>
+                                    <li>If the automatic compression fails, you must **manually resize** your photo using this website: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:no-underline">Simple Image Resizer</a>.</li>
                                     <li>Steps for manual resize:
                                         <ul className="list-disc list-inside ml-4 space-y-1">
                                             <li>Upload your photo.</li>
@@ -274,11 +302,13 @@ function VillagerForm() {
                             </div>
                             <hr className="my-4" />
                             <div>
-                                <h4 className="font-semibold text-lg">📌 ಫೋಟೋ ಅಪ್ಲೋಡ್ ನಿಯಮಗಳು (Kannada)</h4>
-                                <ol className="list-decimal list-inside space-y-2 text-gray-700">
+                                <h4 className="font-semibold text-lg text-gray-700 flex items-center">
+                                    <span className="mr-2 text-yellow-500">📌</span>ಫೋಟೋ ಅಪ್ಲೋಡ್ ನಿಯಮಗಳು (Kannada)
+                                </h4>
+                                <ol className="list-decimal list-inside space-y-2 text-gray-700 mt-2">
                                     <li>ಗರಿಷ್ಠ ಫೋಟೋ ಗಾತ್ರವು 145px ಅಗಲ ಮತ್ತು 175px ಎತ್ತರ ಇರಬೇಕು.</li>
                                     <li>ನಿಮ್ಮ ಫೋಟೋವನ್ನು ಅಗತ್ಯವಿರುವ ಗಾತ್ರಕ್ಕೆ **ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಕುಗ್ಗಿಸಲು** ನಮ್ಮ ವ್ಯವಸ್ಥೆಯು ಪ್ರಯತ್ನಿಸುತ್ತದೆ.</li>
-                                    <li>ಸ್ವಯಂಚಾಲಿತ ಕುಗ್ಗಿಸುವಿಕೆ ವಿಫಲವಾದರೆ, ನೀವು ಈ ವೆಬ್‌ಸೈಟ್ ಬಳಸಿ ಫೋಟೋವನ್ನು **ಕೈಯಾರೆ ರಿಸೈಜ್ ಮಾಡಬೇಕು**: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Simple Image Resizer</a>.</li>
+                                    <li>ಸ್ವಯಂಚಾಲಿತ ಕುಗ್ಗಿಸುವಿಕೆ ವಿಫಲವಾದರೆ, ನೀವು ಈ ವೆಬ್‌ಸೈಟ್ ಬಳಸಿ ಫೋಟೋವನ್ನು **ಕೈಯಾರೆ ರಿಸೈಜ್ ಮಾಡಬೇಕು**: <a href="https://www.simpleimageresizer.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:no-underline">Simple Image Resizer</a>.</li>
                                     <li>ಫೋಟೋ ರಿಸೈಜ್ ಮಾಡುವ ವಿಧಾನ:
                                         <ul className="list-disc list-inside ml-4 space-y-1">
                                             <li>ನಿಮ್ಮ ಫೋಟೋ ಅಪ್ಲೋಡ್ ಮಾಡಿ.</li>
@@ -298,6 +328,7 @@ function VillagerForm() {
         </div>
     );
 }
+
 function BusinessPage({ user }) {
     const { businessType } = useParams();
     const [businesses, setBusinesses] = useState([]);
@@ -991,7 +1022,7 @@ function SearchPage({ user }) {
     };
 
     return (
-        <div className="p-8 max-w-4xl mx-auto min-h-screen">
+        <div className="p-8 max-w-4xl mx-auto min-h-screen bg-gray-50">
             <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">Villager Details</h2>
             <div className="mb-6">
                 <form onSubmit={(e) => { e.preventDefault(); handleSearch(searchQuery); }} className="flex">
@@ -1012,25 +1043,58 @@ function SearchPage({ user }) {
             ) : searchResults.length > 0 ? (
                 <div className="space-y-4">
                     {searchResults.map((villager) => (
-                        <div key={villager.id} className="bg-white p-6 rounded-lg shadow-md flex items-center space-x-4">
+                        <div key={villager.id} className="bg-white p-6 rounded-lg shadow-md flex items-start space-x-6 border border-gray-200">
                             {villager.photoURL && (
                                 <img
                                     src={villager.photoURL}
                                     alt={`${villager.name}'s photo`}
-                                    className="w-20 h-20 rounded-full object-cover flex-shrink-0"
+                                    className="w-24 h-24 rounded-full object-cover flex-shrink-0 border-2 border-blue-400"
                                 />
                             )}
-                            <div className="flex-1">
-                                <h3 className="font-bold text-xl text-blue-700">{villager.name}</h3>
-                                {villager.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{villager.phone}</span></p>}
-                                {villager.work && <p className="text-gray-700 text-sm">Work: <span className="font-semibold">{villager.work}</span></p>}
-                                {villager.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{villager.address}</span></p>}
-                                {villager.age && <p className="text-gray-700 text-sm">Age: <span className="font-semibold">{villager.age}</span></p>}
-                                {villager.dob && <p className="text-gray-700 text-sm">Date of Birth: <span className="font-semibold">{villager.dob}</span></p>}
-                                {villager.locationLink && <p className="text-gray-700 text-sm">Location: <a href={villager.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
+                            <div className="flex-1 space-y-3">
+                                <div className="flex items-center space-x-2">
+                                    <FaUser className="text-blue-500 text-xl" />
+                                    <h3 className="font-bold text-xl text-gray-800">{villager.name}</h3>
+                                </div>
+                                {villager.phone && (
+                                    <div className="flex items-center space-x-2 text-gray-700">
+                                        <FaPhone className="text-green-500 text-lg" />
+                                        <p className="text-sm">Phone: <span className="font-semibold">{villager.phone}</span></p>
+                                    </div>
+                                )}
+                                {villager.work && (
+                                    <div className="flex items-center space-x-2 text-gray-700">
+                                        <FaBriefcase className="text-purple-500 text-lg" />
+                                        <p className="text-sm">Work: <span className="font-semibold">{villager.work}</span></p>
+                                    </div>
+                                )}
+                                {villager.address && (
+                                    <div className="flex items-center space-x-2 text-gray-700">
+                                        <FaMapMarkerAlt className="text-red-500 text-lg" />
+                                        <p className="text-sm">Address: <span className="font-semibold">{villager.address}</span></p>
+                                    </div>
+                                )}
+                                {villager.age && (
+                                    <div className="flex items-center space-x-2 text-gray-700">
+                                        <FaBirthdayCake className="text-orange-500 text-lg" />
+                                        <p className="text-sm">Age: <span className="font-semibold">{villager.age}</span></p>
+                                    </div>
+                                )}
+                                {villager.dob && (
+                                    <div className="flex items-center space-x-2 text-gray-700">
+                                        <FaCalendarAlt className="text-teal-500 text-lg" />
+                                        <p className="text-sm">Date of Birth: <span className="font-semibold">{villager.dob}</span></p>
+                                    </div>
+                                )}
+                                {villager.locationLink && (
+                                    <div className="flex items-center space-x-2 text-gray-700">
+                                        <FaMapMarkerAlt className="text-red-500 text-lg" />
+                                        <p className="text-sm">Location: <a href={villager.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline hover:no-underline">View on Map</a></p>
+                                    </div>
+                                )}
                             </div>
                             {user && (
-                                <button onClick={() => handleDeleteVillager(villager.id)} className="flex items-center space-x-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-200 text-sm">
+                                <button onClick={() => handleDeleteVillager(villager.id)} className="flex items-center space-x-2 bg-red-500 text-white py-1 px-3 rounded-md hover:bg-red-600 transition duration-200 text-sm self-start">
                                     <FaTrash />
                                     <span>Delete</span>
                                 </button>
