@@ -9,10 +9,9 @@ import myPhoto from './myphoto.jpg';
 import AnnouncementForm from './AnnouncementForm';
 import AnnouncementList from './AnnouncementList';
 import { FaUser, FaPhone, FaBriefcase, FaMapMarkerAlt, FaStar, FaInfoCircle, FaSchool, FaStore, FaWineBottle, FaIndustry, FaLandmark, FaWrench, FaStethoscope, FaTools, FaChalkboardTeacher, FaTrash, FaComments, FaBullhorn, FaCalendarAlt, FaIdBadge, FaPlayCircle, FaGlobe, FaClock, FaTemperatureHigh, FaWind, FaCloud, FaUmbrella, FaEdit, FaPlus, FaSave, FaImage, FaArrowLeft, FaBirthdayCake} from "react-icons/fa";
+import ComplaintSection from './ComplaintSection';
 // All components are combined into this single file for simplicity.
 import imageCompression from 'browser-image-compression';
-
-
 // ... (other imports)
 
 // Asynchronously checks image dimensions
@@ -1355,10 +1354,6 @@ function HomePage({ user }) {
                         <Link to="/add-villager-details" className="bg-gradient-to-r from-yellow-400 to-yellow-300 text-blue-900 px-6 py-2 rounded-full shadow-lg font-bold hover:scale-105 transition-transform duration-300">
                             Add Details <br/> <span className="text-sm font-normal">ವಿವರಗಳನ್ನು ಸೇರಿಸಿ</span>
                         </Link>
-                        <Link to="/feedback" className="bg-gray-400 text-white px-4 py-2 rounded-full hover:bg-gray-500 transition-colors duration-300 flex items-center space-x-2">
-                            <span>Complaint</span>
-                            <span>/ ದೂರು</span>
-                        </Link>
                     </div>
                     <button
                         onClick={() => navigate('/search')}
@@ -1474,6 +1469,8 @@ function HomePage({ user }) {
                     </div>
                 </div>
             </div>
+            
+            <ComplaintSection />
 
             <div className="max-w-5xl mx-auto px-4 mt-12 mb-20">
                 <h3 className="text-3xl font-semibold text-center text-gray-800 mb-6">Submitted Villager Details <br/> <span className="text-xl font-normal">ಸಲ್ಲಿಸಿದ ಗ್ರಾಮಸ್ಥರ ವಿವರಗಳು</span></h3>
