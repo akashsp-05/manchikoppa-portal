@@ -328,7 +328,6 @@ function VillagerForm() {
         </div>
     );
 }
-
 function BusinessPage({ user }) {
     const { businessType } = useParams();
     const [businesses, setBusinesses] = useState([]);
@@ -410,23 +409,20 @@ function BusinessPage({ user }) {
             await updateDoc(docRef, { members: businessToUpdate.members });
             alert("Staff details updated successfully!");
         } catch (error) {
-                console.error("Error updating staff details:", error);
-                alert("Failed to save changes. Please try again.");
-            }
+            console.error("Error updating staff details:", error);
+            alert("Failed to save changes. Please try again.");
+        }
     };
     
     const handleRemoveMember = async (businessId, memberToRemove) => {
         if (window.confirm("Are you sure you want to remove this staff member?")) {
             const businessDocRef = doc(db, "businesses", businessId);
-            const businessToUpdate = businesses.find(biz => biz.id === businessId);
-            const updatedMembers = businessToUpdate.members.filter(m => m.name !== memberToRemove.name || m.phone !== memberToRemove.phone);
-
             try {
-                await updateDoc(businessDocRef, { members: updatedMembers });
+                await updateDoc(businessDocRef, { members: arrayRemove(memberToRemove) });
                 
                 setBusinesses(businesses.map(biz => {
                     if (biz.id === businessId) {
-                        return { ...biz, members: updatedMembers };
+                        return { ...biz, members: biz.members.filter(m => JSON.stringify(m) !== JSON.stringify(memberToRemove)) };
                     }
                     return biz;
                 }));
@@ -447,113 +443,149 @@ function BusinessPage({ user }) {
     };
 
     return (
-        <div className="p-8 max-w-5xl mx-auto">
+        <div className="p-8 max-w-5xl mx-auto bg-blue-100">
             <h2 className="text-3xl font-bold mb-6 text-center text-blue-700">{businessType} Details</h2>
             {user && (
-                <Link to={`/add-business-details/${businessType}`} className="px-4 py-2 bg-green-500 text-white rounded-lg mb-4 inline-block">Add New {businessType}</Link>
+                <Link to={`/add-business-details/${businessType}`} className="px-4 py-2 bg-green-500 text-white rounded-lg mb-4 inline-block hover:bg-green-600 transition duration-300 shadow-lg">Add New {businessType}</Link>
             )}
 
             {isLoading ? (
                 <p className="text-center text-gray-500">Loading...</p>
             ) : businesses.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {businesses.map((biz) => (
-                        <div key={biz.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col space-y-4 relative">
-                            {/* Reordered to show Name and Photo first */}
-                            <div className="flex flex-col items-center">
-                                <h3 className="font-bold text-xl text-blue-700 mb-2 text-center">{biz.name}</h3>
+                        <div key={biz.id} className="bg-white p-8 rounded-2xl shadow-xl flex flex-col space-y-6 relative hover:shadow-2xl transition-shadow duration-300">
+                            {/* Header Section: Name and Photo */}
+                            <div className="flex flex-col items-center border-b pb-4">
+                                <h3 className="font-extrabold text-2xl text-blue-800 mb-2 text-center">{biz.name}</h3>
                                 {biz.photoURL && (
                                     <>
                                         <p className="text-gray-700 text-sm font-semibold mt-2">{getPhotoLabel()}:</p>
                                         <img
                                             src={biz.photoURL}
                                             alt={`${biz.name} ${businessType} Photo`}
-                                            className="w-32 h-32 rounded-lg object-cover flex-shrink-0 mt-2"
+                                            className="w-40 h-40 rounded-xl object-cover flex-shrink-0 mt-2 shadow-inner"
                                         />
                                     </>
                                 )}
                             </div>
                             
-                            {/* Horizontal line as a separator */}
-                            <hr className="my-4" />
-
-                            {/* Remaining details in a new flex container */}
-                            <div className="flex-1 space-y-2">
-                                {biz.ownerName && <p className="text-gray-700 text-sm">{getOwnerLabel()}: <span className="font-semibold">{biz.ownerName}</span></p>}
-                                {biz.phone && <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{biz.phone}</span></p>}
-                                {biz.address && <p className="text-gray-700 text-sm">Address: <span className="font-semibold">{biz.address}</span></p>}
-                                {biz.specification && <p className="text-gray-700 text-sm">Specification: <span className="font-semibold">{biz.specification}</span></p>}
-                                {biz.locationLink && <p className="text-gray-700 text-sm">Location: <a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View on Map</a></p>}
+                            {/* Main Details Section */}
+                            <div className="flex-1 space-y-4 bg-gray-50 p-4 rounded-lg">
+                                {biz.ownerName && 
+                                    <div className="flex items-center space-x-3">
+                                        <FaUser className="text-blue-600 text-lg" />
+                                        <p className="text-gray-800 text-md">{getOwnerLabel()}: <span className="font-semibold text-gray-900">{biz.ownerName}</span></p>
+                                    </div>
+                                }
+                                {biz.phone && 
+                                    <div className="flex items-center space-x-3">
+                                        <FaPhone className="text-green-600 text-lg" />
+                                        <p className="text-gray-800 text-md">Phone: <span className="font-semibold text-gray-900">{biz.phone}</span></p>
+                                    </div>
+                                }
+                                {biz.address && 
+                                    <div className="flex items-center space-x-3">
+                                        <FaMapMarkerAlt className="text-red-600 text-lg" />
+                                        <p className="text-gray-800 text-md">Address: <span className="font-semibold text-gray-900">{biz.address}</span></p>
+                                    </div>
+                                }
+                                {biz.specification && 
+                                    <div className="flex items-center space-x-3">
+                                        <FaStar className="text-yellow-600 text-lg" />
+                                        <p className="text-gray-800 text-md">Specification: <span className="font-semibold text-gray-900">{biz.specification}</span></p>
+                                    </div>
+                                }
+                                {biz.locationLink && 
+                                    <div className="flex items-center space-x-3">
+                                        <FaMapMarkerAlt className="text-blue-600 text-lg" />
+                                        <p className="text-gray-800 text-md">Location: <a href={biz.locationLink} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline hover:text-blue-800 transition duration-300">View on Map</a></p>
+                                    </div>
+                                }
                             </div>
 
-                            {/* Public View: Read-only Staff Details */}
-                            {!user && hasMembers && (
-                                <div className="mt-4">
-                                    <h4 className="font-semibold text-lg text-blue-600 mb-2">Staff/Members:</h4>
-                                    <ol className="list-decimal list-inside space-y-1">
-                                        {(biz.members || []).map((member, idx) => (
-                                            <li key={idx}>
-                                                <p className="text-gray-700 text-sm">Name: <span className="font-semibold">{member.name}</span></p>
-                                                <p className="text-gray-700 text-sm">Work: <span className="font-semibold">{member.work}</span></p>
-                                                <p className="text-gray-700 text-sm">Phone: <span className="font-semibold">{member.phone}</span></p>
-                                            </li>
-                                        ))}
-                                    </ol>
-                                </div>
-                            )}
-
-                            {/* Admin View: Editable Staff Details */}
-                            {user && hasMembers && (
-                                <div className="mt-4">
-                                    <h4 className="font-semibold text-lg text-blue-600 mb-2">Staff/Members:</h4>
+                            {/* Staff/Members Section */}
+                            {hasMembers && (
+                                <div className="mt-6">
+                                    <h4 className="font-bold text-xl text-blue-700 mb-4">Staff/Members:</h4>
                                     <div className="space-y-4">
                                         {(biz.members || []).map((member, idx) => (
-                                            <div key={idx} className="flex flex-col space-y-2 border p-3 rounded-md">
-                                                <div className="flex items-center space-x-2">
-                                                    <input
-                                                        type="text"
-                                                        name="name"
-                                                        value={member.name}
-                                                        onChange={(e) => handleMemberChange(biz.id, idx, e)}
-                                                        className="flex-1 px-2 py-1 border rounded-md text-sm"
-                                                        placeholder="Name"
-                                                    />
-                                                    <input
-                                                        type="text"
-                                                        name="work"
-                                                        value={member.work}
-                                                        onChange={(e) => handleMemberChange(biz.id, idx, e)}
-                                                        className="flex-1 px-2 py-1 border rounded-md text-sm"
-                                                        placeholder="Work"
-                                                    />
-                                                    <input
-                                                        type="tel"
-                                                        name="phone"
-                                                        value={member.phone}
-                                                        onChange={(e) => handleMemberChange(biz.id, idx, e)}
-                                                        className="flex-1 px-2 py-1 border rounded-md text-sm"
-                                                        placeholder="Phone"
-                                                    />
-                                                    <button onClick={() => handleRemoveMember(biz.id, member)} className="text-red-500 hover:text-red-700 text-sm"><FaTrash /></button>
-                                                </div>
+                                            <div key={idx} className="flex flex-col space-y-2 border p-4 rounded-lg shadow-sm">
+                                                {/* Public/Admin View for Member Details */}
+                                                {!user && (
+                                                    <>
+                                                        <div className="flex items-center space-x-2">
+                                                            <FaUser className="text-gray-500" />
+                                                            <p className="text-gray-700 text-sm">Name: <span className="font-semibold text-gray-900">{member.name}</span></p>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <FaBriefcase className="text-gray-500" />
+                                                            <p className="text-gray-700 text-sm">Work: <span className="font-semibold text-gray-900">{member.work}</span></p>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <FaPhone className="text-gray-500" />
+                                                            <p className="text-gray-700 text-sm">Phone: <span className="font-semibold text-gray-900">{member.phone}</span></p>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                {user && (
+                                                    <div className="flex flex-col space-y-2">
+                                                        <div className="flex items-center space-x-2">
+                                                            <FaUser className="text-gray-500" />
+                                                            <input
+                                                                type="text"
+                                                                name="name"
+                                                                value={member.name}
+                                                                onChange={(e) => handleMemberChange(biz.id, idx, e)}
+                                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                placeholder="Name"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <FaBriefcase className="text-gray-500" />
+                                                            <input
+                                                                type="text"
+                                                                name="work"
+                                                                value={member.work}
+                                                                onChange={(e) => handleMemberChange(biz.id, idx, e)}
+                                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                placeholder="Work"
+                                                            />
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <FaPhone className="text-gray-500" />
+                                                            <input
+                                                                type="tel"
+                                                                name="phone"
+                                                                value={member.phone}
+                                                                onChange={(e) => handleMemberChange(biz.id, idx, e)}
+                                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                placeholder="Phone"
+                                                            />
+                                                        </div>
+                                                        <button onClick={() => handleRemoveMember(biz.id, member)} className="self-end text-red-500 hover:text-red-700 transition duration-300 text-lg mt-2"><FaTrash /></button>
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="flex space-x-2 mt-4">
-                                        <button onClick={() => handleAddMember(biz.id)} className="flex items-center space-x-2 bg-green-500 text-white py-1 px-3 rounded-md hover:bg-green-600 transition duration-200 text-sm">
-                                            <FaPlus />
-                                            <span>Add Staff</span>
-                                        </button>
-                                        <button onClick={() => handleSaveMembers(biz.id)} className="flex items-center space-x-2 bg-blue-500 text-white py-1 px-3 rounded-md hover:bg-blue-600 transition duration-200 text-sm">
-                                            <FaSave />
-                                            <span>Save</span>
-                                        </button>
-                                    </div>
+                                    {user && (
+                                        <div className="flex space-x-3 mt-4">
+                                            <button onClick={() => handleAddMember(biz.id)} className="flex items-center space-x-2 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300 text-sm font-semibold shadow-lg">
+                                                <FaPlus />
+                                                <span>Add Staff</span>
+                                            </button>
+                                            <button onClick={() => handleSaveMembers(biz.id)} className="flex items-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300 text-sm font-semibold shadow-lg">
+                                                <FaSave />
+                                                <span>Save</span>
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
                             {user && (
-                                <button onClick={() => handleDeleteBusiness(biz.id)} className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition duration-200 text-sm flex items-center justify-center">
+                                <button onClick={() => handleDeleteBusiness(biz.id)} className="absolute top-4 right-4 bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition duration-300 text-md flex items-center justify-center shadow-lg">
                                     <FaTrash />
                                 </button>
                             )}
